@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SellerProfileController;
+use App\Http\Controllers\SellerDashboardController;
+use App\Http\Controllers\VerificationRequestController;
 use App\Models\SellerProfile;
 
 Route::get('/', function () {
@@ -27,9 +29,7 @@ Route::middleware(['auth'])->group(function () {
         return view('buyer.dashboard');
     })->name('buyer.dashboard');
 
-    Route::get('/seller/dashboard', function () {
-        return view('seller.dashboard');
-    })->name('seller.dashboard');
+    Route::get('/seller/dashboard', [SellerDashboardController::class, 'index'])->name('seller.dashboard');
 
     Route::get('/regulator/dashboard', function () {
         return view('regulator.dashboard');
@@ -39,24 +39,25 @@ Route::middleware(['auth'])->group(function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
 
+    Route::get('/seller/verification/create', [VerificationRequestController::class, 'create'])->name('seller.verification.create');
+    Route::post('/seller/verification/store', [VerificationRequestController::class, 'store'])->name('seller.verification.store');
 
     Route::get('/buyer/search', function () {
-
-        $search=request('search');
+        $search = request('search');
         $sellers = SellerProfile::query()
 
             ->when($search, function ($query) use ($search) {
-                $query->where('brand_name', 'like', "%{$search}%")
+                $query
+                    ->where('brand_name', 'like', "%{$search}%")
                     ->orWhere('business_category', 'like', "%{$search}%")
                     ->orWhere('location', 'like', "%{$search}%");
             })
-           
-        
+
             ->get();
         return view('buyer.search', compact('sellers'));
-    })->middleware('auth')->name('buyer.search');
-
-
+    })
+        ->middleware('auth')
+        ->name('buyer.search');
 
     Route::get('/seller/profile/create', [SellerProfileController::class, 'create'])->name('seller.profile.create');
     Route::post('/seller/profile/store', [SellerProfileController::class, 'store'])->name('seller.profile.store');
