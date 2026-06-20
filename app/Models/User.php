@@ -33,6 +33,15 @@ class User extends Authenticatable
 
     public function sellerProfile()
     {
-        return $this->hasOne(SellerProfile::class);
+    return $this->hasOne(\App\Models\SellerProfile::class);
     }
+   
+    // app/Models/User.php
+public function buyerProfile()
+{
+    return $this->hasOne(\App\Models\BuyerProfile::class, 'user_id');
+}
+
+
+
 }

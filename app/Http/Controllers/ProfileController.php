@@ -20,6 +20,11 @@ class ProfileController extends Controller
             'user' => $request->user(),
         ]);
     }
+    public function show($id)
+{
+    $profile = Auth::user()->sellerProfile;
+    return view('seller.profile.show', compact('profile'));
+}
 
     /**
      * Update the user's profile information.

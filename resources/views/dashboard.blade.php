@@ -1,17 +1,24 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+@section('content')
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Seller Dashboard</h2>
+
+    @if($sellerProfile)
+        <p><strong>Brand Name:</strong> {{ $sellerProfile->brand_name ?? 'Not Set' }}</p>
+        <p><strong>Business Category:</strong> {{ $sellerProfile->category ?? 'N/A' }}</p>
+        <p><strong>Location:</strong> {{ $sellerProfile->location ?? 'N/A' }}</p>
+        <p><strong>Phone Number:</strong> {{ $sellerProfile->phone ?? 'N/A' }}</p>
+        <p><strong>Social Platform:</strong> {{ $sellerProfile->social_platform ?? 'N/A' }}</p>
+        <p><strong>Shop Link:</strong> {{ $sellerProfile->shop_link ?? 'N/A' }}</p>
+        <p><strong>Description:</strong> {{ $sellerProfile->description ?? 'No description provided' }}</p>
+
+    @else
+        <p class="text-red-600">You have not completed your profile yet.</p>
+        <a href="{{ route('seller.profile.create') }}" 
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+           Complete Profile
+        </a>
+    @endif
+</div>
+@endsection

@@ -48,8 +48,14 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
+
+                            <!-- ✅ FIXED PART ONLY -->
+                            <x-dropdown-link
+                                :href="auth()->user()->sellerProfile
+                                    ? route('seller.profile.show', auth()->user()->sellerProfile->id)
+                                    : route('seller.profile.create')">
+
+                                🏬 My Seller Profile
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -99,8 +105,14 @@
                 </div>
 
                 <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+
+                    <!-- ✅ FIXED PART ONLY -->
+                    <x-responsive-nav-link
+                        :href="auth()->user()->sellerProfile
+                            ? route('seller.profile.show', auth()->user()->sellerProfile->id)
+                            : route('seller.profile.create')">
+
+                        🏬 My Seller Profile
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->
@@ -116,4 +128,5 @@
                 </div>
             </div>
         </div>
+    </div>
 </nav>
