@@ -16,11 +16,16 @@ class SellerProfileController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'brand_name' => 'required',
-            'business_category' => 'required',
-            'location' => 'required',
-            'phone_number' => 'required',
-            'social_platform' => 'required',
+            'brand_name' => 'required|string|max:255',
+            'business_category' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'social_platform' => 'required|string|max:255',
+            'shop_link' => 'nullable|url',
+            'description' => 'nullable|string',
+            'profile_photo' => 'nullable|image|max:2048',
+            'id_front' => 'nullable|image|max:2048',
+            'id_back' => 'nullable|image|max:2048',
         ]);
 
         SellerProfile::create([
@@ -32,6 +37,9 @@ class SellerProfileController extends Controller
             'social_platform' => $request->social_platform,
             'shop_link' => $request->shop_link,
             'description' => $request->description,
+            'profile_photo' => $request->file('profile_photo')?->store('profiles', 'public'),
+            'id_front' => $request->file('id_front')?->store('ids', 'public'),
+            'id_back' => $request->file('id_back')?->store('ids', 'public'),
             'verification_status' => 'pending',
         ]);
 
@@ -41,6 +49,7 @@ class SellerProfileController extends Controller
     public function show()
     {
         $profile = SellerProfile::firstWhere('user_id', Auth::id());
+
         return view('seller.profile.show', compact('profile'));
     }
 
@@ -58,14 +67,31 @@ class SellerProfileController extends Controller
         $validated = $request->validate([
             'brand_name' => 'required|string|max:255',
             'business_category' => 'required|string|max:255',
-            'description' => 'required|string',
             'location' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'social_platform' => 'required|string|max:255',
-            'shop_link' => 'nullable|string|max:255',
+            'shop_link' => 'nullable|url',
+            'description' => 'nullable|string',
+            'profile_photo' => 'nullable|image|max:2048',
+            'id_front' => 'nullable|image|max:2048',
+            'id_back' => 'nullable|image|max:2048',
         ]);
 
         $profile->update($validated);
+
+        if ($request->hasFile('profile_photo')) {
+            $profile->profile_photo = $request->file('profile_photo')->store('profiles', 'public');
+        }
+
+        if ($request->hasFile('id_front')) {
+            $profile->id_front = $request->file('id_front')->store('ids', 'public');
+        }
+
+        if ($request->hasFile('id_back')) {
+            $profile->id_back = $request->file('id_back')->store('ids', 'public');
+        }
+
+        $profile->save();
 
         return redirect()->route('seller.profile.show')->with('success', 'Profile updated successfully!');
     }

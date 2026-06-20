@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class SellerProfile extends Model
 {
     protected $fillable = [
@@ -16,16 +15,11 @@ class SellerProfile extends Model
         'social_platform',
         'shop_link',
         'description',
-        'verification_status'
+        'profile_photo',
+        'id_front',
+        'id_back',
+        'verification_status',
     ];
-
-     /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        
-    }
 
     public function user()
     {

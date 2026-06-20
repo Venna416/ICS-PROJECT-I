@@ -2,11 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    protected $fillable = ['buyer_id', 'seller_id', 'rating', 'comment'];
+    use HasFactory;
+
+    protected $fillable = [
+        'buyer_id',
+        'seller_id',
+        'rating',
+        'comment',
+    ];
 
     public function buyer()
     {

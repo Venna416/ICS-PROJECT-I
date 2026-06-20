@@ -1,72 +1,84 @@
-<x-app-layout>
-    @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">Complete Your Seller Profile</h2>
+
+    <form action="{{ route('seller.profile.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
+
+        <!-- Profile Photo -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Profile Photo</label>
+            <input type="file" name="profile_photo" accept="image/*"
+                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
         </div>
-    @endif
 
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
+        <!-- Business Details -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Brand Name</label>
+            <input type="text" name="brand_name"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
         </div>
-    @endif
 
-    <div class="p-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Business Category</label>
+            <input type="text" name="category"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-        <h2 class="text-xl font-bold mb-4">
-            Create Seller Profile
-        </h2>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Location</label>
+            <input type="text" name="location"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-        <form method="POST" action="{{ route('seller.profile.store') }}">
-            @csrf
+        <!-- Contact Info -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input type="text" name="phone"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-            <div class="mb-3">
-                <label>Brand Name</label>
-                <input type="text" name="brand_name" class="border p-2 w-full" required>
-            </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Social Platform</label>
+            <input type="text" name="social_platform"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-            <div class="mb-3">
-                <label>Business Category</label>
-                <input type="text" name="business_category" class="border p-2 w-full" required>
-            </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Shop Link</label>
+            <input type="url" name="shop_link"
+                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-            <div class="mb-3">
-                <label>Location</label>
-                <input type="text" name="location" class="border p-2 w-full" required>
-            </div>
+        <!-- ID Upload -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">National ID (Front)</label>
+            <input type="file" name="id_front" accept="image/*"
+                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
+        </div>
 
-            <div class="mb-3">
-                <label>Phone Number</label>
-                <input type="text" name="phone_number" class="border p-2 w-full" required>
-            </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">National ID (Back)</label>
+            <input type="file" name="id_back" accept="image/*"
+                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
+        </div>
 
-            <div class="mb-3">
-                <label>Social Platform</label>
-                <select name="social_platform" class="border p-2 w-full" required>
-                    <option value="">Select Platform</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="WhatsApp">WhatsApp</option>
-                </select>
-            </div>
+        <!-- Description -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Business Description</label>
+            <textarea name="description" rows="4"
+                      class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
 
-            <div class="mb-3">
-                <label>Shop Link</label>
-                <input type="text" name="shop_link" class="border p-2 w-full">
-            </div>
-
-            <div class="mb-3">
-                <label>Description</label>
-                <textarea name="description" class="border p-2 w-full" rows="4"></textarea>
-            </div>
-
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+        <!-- Submit -->
+        <div class="flex justify-end">
+            <button type="submit"
+                    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 focus:ring focus:ring-blue-300">
                 Save Profile
             </button>
-
-        </form>
-
-    </div>
-
-</x-app-layout>
+        </div>
+    </form>
+</div>
+@endsection

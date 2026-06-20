@@ -10,11 +10,8 @@ class ReviewController extends Controller
 {
     public function store(Request $request, $sellerId)
     {
-        $existingReview = Review::query()
-            ->where([
-                ['buyer_id', Auth::id()],
-                ['seller_id', $sellerId],
-            ])
+        $existingReview = Review::where('buyer_id', '=', Auth::id(), 'and')
+            ->where('seller_id', '=', $sellerId, 'and')
             ->first();
 
         if ($existingReview) {
@@ -66,7 +63,7 @@ class ReviewController extends Controller
         ]);
 
         return redirect()
-        ->route('buyer.seller.details', ['id' => $review->seller_id])
-        ->with('success', 'Review updated successfully.');
+            ->route('buyer.seller.details', ['id' => $review->seller_id])
+            ->with('success', 'Review updated successfully.');
     }
 }

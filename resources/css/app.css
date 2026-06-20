@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* General body */
+body {
+    background: #f9fafb; /* light gray background */
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Header links */
+header nav a {
+    transition: all 0.3s ease-in-out;
+}
+header nav a:hover {
+    transform: translateY(-2px);
+    color: #facc15;
+}
+
+/* Dashboard grid */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    display: block;
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: #34d399; /* lighter emerald green */
+    color: #1f2937; /* dark gray text */
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+.dashboard-card:hover {
+    transform: scale(1.05);
+    background-color: #6ee7b7; /* mint green hover */
+}
+
+/* Header */
+header {
+    background-color: #10b981; /* medium green */
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Footer (same as header) */
+footer {
+    background-color: #10b981; /* same medium green */
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.875rem;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+
+/* Inputs and textarea */
+input, select, textarea {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Button hover effect */
+button:hover {
+    transform: scale(1.05);
+}

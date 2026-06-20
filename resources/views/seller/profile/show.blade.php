@@ -1,37 +1,97 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Seller Profile
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+@section('content')
+    <div class="py-6">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            <p><strong>Brand Name:</strong> {{ $profile->brand_name }}</p>
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-            <p><strong>Business Category:</strong> {{ $profile->business_category }}</p>
+            <div class="bg-white p-6 rounded-lg shadow space-y-4">
 
-            <p><strong>Location:</strong> {{ $profile->location }}</p>
+                <p><strong>Brand Name:</strong> {{ $profile->brand_name ?? 'N/A' }}</p>
 
-            <p><strong>Phone Number:</strong> {{ $profile->phone_number }}</p>
+                <p><strong>Business Category:</strong>
+                    {{ $profile->business_category ?? 'N/A' }}
+                </p>
 
-            <p><strong>Social Platform:</strong> {{ $profile->social_platform }}</p>
+                <p><strong>Location:</strong>
+                    {{ $profile->location ?? 'N/A' }}
+                </p>
 
-            <p><strong>Shop Link:</strong> {{ $profile->shop_link }}</p>
+                <p><strong>Phone Number:</strong>
+                    {{ $profile->phone_number ?? 'N/A' }}
+                </p>
 
-            <p><strong>Description:</strong> {{ $profile->description }}</p>
+                <p><strong>Social Platform:</strong>
+                    {{ $profile->social_platform ?? 'N/A' }}
+                </p>
 
-            <p><strong>Verification Status:</strong>
-                {{ $profile->verification_status }}
-            </p>
+                <p>
+                    <strong>Shop Link:</strong>
 
-            <br>
+                    @if ($profile->shop_link)
+                        <a href="{{ $profile->shop_link }}" target="_blank" class="text-blue-600 hover:underline">
+                            {{ $profile->shop_link }}
+                        </a>
+                    @else
+                        N/A
+                    @endif
+                </p>
 
-            <a href="{{ route('seller.profile.edit') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
-                Edit Profile
-            </a>
+                <p>
+                    <strong>Description:</strong>
+                    {{ $profile->description ?? 'No description provided.' }}
+                </p>
+
+                <p>
+                    <strong>Verification Status:</strong>
+
+                    <span
+                        class="px-2 py-1 rounded
+                    {{ $profile->verification_status === 'verified'
+                        ? 'bg-green-200 text-green-800'
+                        : ($profile->verification_status === 'rejected'
+                            ? 'bg-red-200 text-red-800'
+                            : 'bg-yellow-200 text-yellow-800') }}">
+                        {{ ucfirst($profile->verification_status ?? 'Pending') }}
+                    </span>
+                </p>
+
+                @if ($profile->profile_photo)
+                    <div>
+                        <strong>Profile Photo:</strong><br>
+
+                        <img src="{{ asset('storage/' . $profile->profile_photo) }}" class="w-32 h-32 rounded-full mt-2">
+                    </div>
+                @endif
+
+            </div>
+
+            <div class="mt-6 flex gap-4">
+
+                <a href="{{ route('seller.profile.edit', $profile->id) }}"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    ✏️ Edit Profile
+                </a>
+
+                <form action="{{ route('seller.profile.destroy', $profile->id) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete your profile?');">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        🗑️ Delete Profile
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
     </div>
-</x-app-layout>
+@endsection

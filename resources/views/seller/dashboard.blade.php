@@ -1,124 +1,90 @@
-<x-app-layout>
+@extends('layouts.app')
 
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Seller Dashboard
-        </h2>
-    </x-slot>
+@section('content')
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="py-6">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    {{ session('success') }}
-                </div>
-            @endif
+        <!-- Status Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <!-- Brand Name -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold text-gray-700 mb-2">Brand Name</h3>
-                    <p class="text-lg">
-                        {{ $profile->brand_name ?? 'Not Set' }}
-                    </p>
-                </div>
-
-                <!-- Verification Status -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold text-gray-700 mb-2">Verification Status</h3>
-                    <p class="text-lg capitalize">
-                        {{ $profile->verification_status ?? 'Pending' }}
-                    </p>
-                </div>
-
-                <!-- Trust Score -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold text-gray-700 mb-2">Trust Score</h3>
-                    <p class="text-lg">
-                        {{ $profile->trust_score ?? 0 }}
-                    </p>
-                </div>
-
-                <!-- Risk Level -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold text-gray-700 mb-2">Risk Level</h3>
-                    <p class="text-lg capitalize">
-                        {{ $profile->risk_level ?? 'Medium' }}
-                    </p>
-                </div>
-
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm uppercase">
+                    Verification Status
+                </h3>
+                <p class="text-2xl font-bold mt-2">
+                    @if($sellerProfile->verification_status == 'verified')
+                        <span class="text-green-600">✅ Verified</span>
+                    @elseif($sellerProfile->verification_status == 'rejected')
+                        <span class="text-red-600">❌ Rejected</span>
+                    @else
+                        <span class="text-yellow-600">⏳ Pending</span>
+                    @endif
+                </p>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="mt-8 bg-white p-6 rounded-lg shadow">
-
-                <h3 class="text-lg font-bold mb-4">
-                    Quick Actions
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm uppercase">
+                    Trust Score
                 </h3>
-
-                <div class="flex flex-wrap gap-4">
-
-                    <a href="{{ route('seller.profile.create') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        Update Profile
-                    </a>
-
-                    <a href="{{ route('buyer.search') }}"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                        Search Sellers
-                    </a>
-
-                </div>
-
+                <p class="text-3xl font-bold text-blue-600 mt-2">
+                    {{ $trustScore ?? 75 }}%
+                </p>
             </div>
 
-            <!-- Seller Information -->
-            <div class="mt-8 bg-white p-6 rounded-lg shadow">
-
-                <h3 class="text-lg font-bold mb-4">
-                    Seller Information
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm uppercase">
+                    Risk Level
                 </h3>
-
-                <div class="space-y-2">
-
-                    <p>
-                        <strong>Business Category:</strong>
-                        {{ $profile->business_category ?? 'N/A' }}
-                    </p>
-
-                    <p>
-                        <strong>Location:</strong>
-                        {{ $profile->location ?? 'N/A' }}
-                    </p>
-
-                    <p>
-                        <strong>Phone Number:</strong>
-                        {{ $profile->phone_number ?? 'N/A' }}
-                    </p>
-
-                    <p>
-                        <strong>Social Platform:</strong>
-                        {{ $profile->social_platform ?? 'N/A' }}
-                    </p>
-
-                    <p>
-                        <strong>Shop Link:</strong>
-                        {{ $profile->shop_link ?? 'N/A' }}
-                    </p>
-
-                    <p>
-                        <strong>Description:</strong>
-                        {{ $profile->description ?? 'No description provided.' }}
-                    </p>
-
-                </div>
-
+                <p class="text-2xl font-bold mt-2">
+                    <span class="text-green-600">
+                        {{ $riskLevel ?? 'Low' }}
+                    </span>
+                </p>
             </div>
 
         </div>
-    </div>
 
-</x-app-layout>
+        <!-- Analytics -->
+        <div class="mt-8">
+            <h3 class="text-lg font-bold mb-4">
+                📊 Analytics
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <p class="text-gray-500">Reviews</p>
+                    <h4 class="text-3xl font-bold">
+                        {{ $reviewCount ?? 0 }}
+                    </h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <p class="text-gray-500">Fraud Reports</p>
+                    <h4 class="text-3xl font-bold">
+                        {{ $fraudCount ?? 0 }}
+                    </h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <p class="text-gray-500">Buyer Searches</p>
+                    <h4 class="text-3xl font-bold">
+                        {{ $searchCount ?? 0 }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-bold mb-4">
+                🔔 Notifications
+            </h3>
+            <ul class="space-y-2">
+                <li>Your verification request is under review.</li>
+                <li>No new fraud reports.</li>
+                <li>No new buyer reviews.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+@endsection
