@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SellerProfileController;
 use App\Http\Controllers\SellerDashboardController;
 use App\Http\Controllers\VerificationRequestController;
+use App\Http\Controllers\ReviewController;
 use App\Models\SellerProfile;
 
 Route::get('/', function () {
@@ -38,6 +40,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    Route::get('/seller/profile', [SellerProfileController::class, 'show'])
+    ->name('seller.profile.show');
+
+    Route::get('/seller/profile/edit', [SellerProfileController::class, 'edit'])
+    ->name('seller.profile.edit');
+
+    Route::put('/seller/profile', [SellerProfileController::class, 'update'])
+    ->name('seller.profile.update');
+
+    Route::get('/buyer/seller/{id}', [BuyerController::class, 'showSeller'])
+    ->name('buyer.seller.details');
+
+    Route::post('/seller/{seller}/review', [ReviewController::class, 'store'])
+    ->name('reviews.store');
+
+    Route::get('/review/{id}/edit', [ReviewController::class, 'edit'])
+    ->name('reviews.edit');
+
+    Route::put('/review/{id}', [ReviewController::class, 'update'])
+    ->name('reviews.update');
 
     Route::get('/seller/verification/create', [VerificationRequestController::class, 'create'])->name('seller.verification.create');
     Route::post('/seller/verification/store', [VerificationRequestController::class, 'store'])->name('seller.verification.store');

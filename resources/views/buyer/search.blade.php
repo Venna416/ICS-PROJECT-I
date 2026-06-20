@@ -29,6 +29,7 @@
                         <th class="border p-2">Verification Status</th>
                         <th class="border p-2">Trust Score</th>
                         <th class="border p-2">Risk Level</th>
+                        <th class="border p-2">Actions</th>
                     </tr>
                 </thead>
 
@@ -42,6 +43,12 @@
                             <td class="border p-2">{{ $seller->verification_status }}</td>
                             <td class="border p-2">{{ $seller->trust_score }}</td>
                             <td class="border p-2">{{ $seller->risk_level }}</td>
+                            <td class="border p-2">
+                                <a href="{{ route('buyer.seller.details', $seller->id) }}"
+                                    class="bg-blue-600 text-white px-4 py-1 rounded">
+                                    View Details
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
 
