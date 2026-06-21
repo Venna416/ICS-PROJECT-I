@@ -11,12 +11,14 @@ class FraudReport extends Model
 
     protected $fillable = [
         'user_id',
+        'seller_profile_id',
         'seller_name',
         'shop_name',
         'shop_link',
         'description',
         'evidence',
         'contact',
+        'status',
     ];
 
     // Optional: link back to the user who submitted the report

@@ -13,6 +13,7 @@ use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\FraudReportController;
 use App\Http\Controllers\BuyerProfileController;
+use App\Http\Controllers\RegulatorController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,33 +25,49 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', function () {
-    return redirect()->route('profile.edit');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $user = Auth::user();
+
+    if ($user->role === 'seller') {
+        return redirect()->route('seller.dashboard');
+    }
+
+    if ($user->role === 'buyer') {
+        return redirect()->route('buyer.dashboard');
+    }
+
+    if ($user->role === 'regulator') {
+        return redirect()->route('regulator.dashboard');
+    }
+
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return redirect('/');
+})
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-
     /*
     |--------------------------------------------------------------------------
     | BUYER DASHBOARD
     |--------------------------------------------------------------------------
     */
     Route::get('/buyer/dashboard', function () {
-
         $user = Auth::user();
 
         if ($user->role === 'buyer') {
-
             if ($user->buyerProfile) {
                 return view('buyer.dashboard', [
-                    'profile' => $user->buyerProfile
+                    'profile' => $user->buyerProfile,
                 ]);
             }
 
             return redirect()->route('buyer.profile.create');
         }
 
-        abort(403, 'Unauthorized');
-
+        abort(403);
     })->name('buyer.dashboard');
 
     /*
@@ -58,42 +75,33 @@ Route::middleware(['auth'])->group(function () {
     | BUYER PROFILE
     |--------------------------------------------------------------------------
     */
-    Route::get('/buyer/profile/create', [BuyerProfileController::class, 'create'])
-        ->name('buyer.profile.create');
+    Route::get('/buyer/profile/create', [BuyerProfileController::class, 'create'])->name('buyer.profile.create');
 
-    Route::post('/buyer/profile/store', [BuyerProfileController::class, 'store'])
-        ->name('buyer.profile.store');
+    Route::post('/buyer/profile/store', [BuyerProfileController::class, 'store'])->name('buyer.profile.store');
 
-    Route::get('/buyer/profile/{id}', [BuyerProfileController::class, 'show'])
-        ->name('buyer.profile.show');
+    Route::get('/buyer/profile/{id}', [BuyerProfileController::class, 'show'])->name('buyer.profile.show');
 
-    Route::get('/buyer/profile/{id}/edit', [BuyerProfileController::class, 'edit'])
-        ->name('buyer.profile.edit');
+    Route::get('/buyer/profile/{id}/edit', [BuyerProfileController::class, 'edit'])->name('buyer.profile.edit');
 
-    Route::put('/buyer/profile/{id}', [BuyerProfileController::class, 'update'])
-        ->name('buyer.profile.update');
+    Route::put('/buyer/profile/{id}', [BuyerProfileController::class, 'update'])->name('buyer.profile.update');
 
     /*
     |--------------------------------------------------------------------------
     | FRAUD REPORTS
     |--------------------------------------------------------------------------
     */
-    Route::get('/buyer/reports', fn() => view('buyer.reports'))
-        ->name('buyer.reports');
+    Route::get('/buyer/reports', fn() => view('buyer.reports'))->name('buyer.reports');
 
-    Route::post('/buyer/reports', [FraudReportController::class, 'store'])
-        ->name('buyer.reports.store');
+    Route::post('/buyer/reports', [FraudReportController::class, 'store'])->name('buyer.reports.store');
 
     /*
     |--------------------------------------------------------------------------
-    | BUYER REVIEWS PAGE
+    | BUYER REVIEWS
     |--------------------------------------------------------------------------
     */
-    Route::get('/buyer/reviews', fn() => view('buyer.reviews'))
-        ->name('buyer.reviews');
+    Route::get('/buyer/reviews', fn() => view('buyer.reviews'))->name('buyer.reviews');
 
-    Route::post('/buyer/reviews', [ReviewController::class, 'store'])
-        ->name('buyer.reviews.store');
+    Route::post('/buyer/reviews', [ReviewController::class, 'store'])->name('buyer.reviews.store');
 
     /*
     |--------------------------------------------------------------------------
@@ -101,19 +109,18 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/buyer/search', function () {
-
         $search = request('search');
 
         $sellers = SellerProfile::query()
             ->when($search, function ($query) use ($search) {
-                $query->where('brand_name', 'like', "%{$search}%")
+                $query
+                    ->where('brand_name', 'like', "%{$search}%")
                     ->orWhere('business_category', 'like', "%{$search}%")
                     ->orWhere('location', 'like', "%{$search}%");
             })
             ->get();
 
         return view('buyer.search', compact('sellers'));
-
     })->name('buyer.search');
 
     /*
@@ -121,75 +128,89 @@ Route::middleware(['auth'])->group(function () {
     | SELLER DETAILS
     |--------------------------------------------------------------------------
     */
-    Route::get('/buyer/seller/{id}', [BuyerController::class, 'showSeller'])
-        ->name('buyer.seller.details');
+    Route::get('/buyer/seller/{id}', [BuyerController::class, 'showSeller'])->name('buyer.seller.details');
 
     /*
     |--------------------------------------------------------------------------
     | REVIEW SYSTEM
     |--------------------------------------------------------------------------
     */
-    Route::post('/reviews/{sellerId}', [ReviewController::class, 'store'])
-        ->name('reviews.store');
+    Route::post('/reviews/{sellerId}', [ReviewController::class, 'store'])->name('reviews.store');
 
-    Route::get('/reviews/{id}/edit', [ReviewController::class, 'edit'])
-        ->name('reviews.edit');
+    Route::get('/reviews/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
 
-    Route::put('/reviews/{id}', [ReviewController::class, 'update'])
-        ->name('reviews.update');
+    Route::put('/reviews/{id}', [ReviewController::class, 'update'])->name('reviews.update');
 
     /*
     |--------------------------------------------------------------------------
     | SELLER DASHBOARD
     |--------------------------------------------------------------------------
     */
-    Route::get('/seller/dashboard', [SellerDashboardController::class, 'index'])
-        ->name('seller.dashboard');
+    Route::get('/seller/dashboard', [SellerDashboardController::class, 'index'])->name('seller.dashboard');
 
     /*
     |--------------------------------------------------------------------------
     | SELLER PROFILE
     |--------------------------------------------------------------------------
     */
-    Route::get('/seller/profile/create', [SellerProfileController::class, 'create'])
-        ->name('seller.profile.create');
+    Route::get('/seller/profile/create', [SellerProfileController::class, 'create'])->name('seller.profile.create');
 
-    Route::post('/seller/profile/store', [SellerProfileController::class, 'store'])
-        ->name('seller.profile.store');
+    Route::post('/seller/profile/store', [SellerProfileController::class, 'store'])->name('seller.profile.store');
 
-    Route::get('/seller/profile/{id}', [SellerProfileController::class, 'show'])
-        ->name('seller.profile.show');
+    Route::get('/seller/profile/{id}', [SellerProfileController::class, 'show'])->name('seller.profile.show');
 
-    Route::get('/seller/profile/{id}/edit', [SellerProfileController::class, 'edit'])
-        ->name('seller.profile.edit');
+    Route::get('/seller/profile/{id}/edit', [SellerProfileController::class, 'edit'])->name('seller.profile.edit');
 
-    Route::put('/seller/profile/{id}', [SellerProfileController::class, 'update'])
-        ->name('seller.profile.update');
+    Route::put('/seller/profile/{id}', [SellerProfileController::class, 'update'])->name('seller.profile.update');
 
-    Route::delete('/seller/profile/{id}', [SellerProfileController::class, 'destroy'])
-        ->name('seller.profile.destroy');
+    Route::delete('/seller/profile/{id}', [SellerProfileController::class, 'destroy'])->name('seller.profile.destroy');
 
     /*
     |--------------------------------------------------------------------------
     | VERIFICATION REQUESTS
     |--------------------------------------------------------------------------
     */
-    Route::get('/seller/verification/create',
-        [VerificationRequestController::class, 'create'])
-        ->name('seller.verification.create');
+    Route::get('/seller/verification/create', [VerificationRequestController::class, 'create'])->name('seller.verification.create');
 
-    Route::post('/seller/verification/store',
-        [VerificationRequestController::class, 'store'])
-        ->name('seller.verification.store');
+    Route::post('/seller/verification/store', [VerificationRequestController::class, 'store'])->name('seller.verification.store');
 
     /*
     |--------------------------------------------------------------------------
     | REGULATOR
     |--------------------------------------------------------------------------
     */
-    Route::get('/regulator/dashboard', function () {
-        return view('regulator.dashboard');
-    })->name('regulator.dashboard');
+    Route::get('/regulator/dashboard', [RegulatorController::class, 'index'])
+    ->name('regulator.dashboard');
+
+    Route::get('/regulator/sellers', [RegulatorController::class, 'sellers'])
+    ->name('regulator.sellers');
+
+    Route::post('/regulator/sellers/{id}/approve', [RegulatorController::class, 'approve'])
+    ->name('regulator.sellers.approve');
+
+    Route::post('/regulator/sellers/{id}/reject', [RegulatorController::class, 'reject'])
+    ->name('regulator.sellers.reject');
+
+    Route::get('/regulator/reports', [RegulatorController::class, 'reports'])
+    ->name('regulator.reports');
+
+    Route::patch('/regulator/reports/{id}/resolve', [RegulatorController::class, 'resolveReport'])
+    ->name('regulator.reports.resolve');
+
+    Route::delete('/regulator/reports/{id}', [RegulatorController::class, 'deleteReport'])
+    ->name('regulator.reports.delete');
+
+    Route::get('/regulator/reviews', [RegulatorController::class, 'reviews'])
+    ->name('regulator.reviews');
+
+    Route::patch('/regulator/reviews/{id}/hide', [RegulatorController::class, 'hideReview'])
+    ->name('regulator.reviews.hide');
+
+    Route::patch('/regulator/reviews/{id}/restore', [RegulatorController::class, 'restoreReview'])
+    ->name('regulator.reviews.restore');
+
+    Route::delete('/regulator/reviews/{id}', [RegulatorController::class, 'deleteReview'])
+    ->name('regulator.reviews.delete');
 
     /*
     |--------------------------------------------------------------------------
@@ -206,25 +227,25 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/profile', function () {
-
         $user = Auth::user();
 
         if ($user->role === 'seller') {
-
-            return $user->sellerProfile
-                ? redirect()->route('seller.profile.show', $user->sellerProfile->id)
-                : redirect()->route('seller.profile.create');
+            return $user->sellerProfile ? redirect()->route('seller.profile.show', $user->sellerProfile->id) : redirect()->route('seller.profile.create');
         }
 
         if ($user->role === 'buyer') {
-
-            return $user->buyerProfile
-                ? redirect()->route('buyer.profile.show', $user->buyerProfile->id)
-                : redirect()->route('buyer.profile.create');
+            return $user->buyerProfile ? redirect()->route('buyer.profile.show', $user->buyerProfile->id) : redirect()->route('buyer.profile.create');
         }
 
-        return redirect()->route('dashboard');
+        if ($user->role === 'regulator') {
+            return redirect()->route('regulator.dashboard');
+        }
 
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect('/');
     })->name('profile.edit');
 
     /*
@@ -232,11 +253,9 @@ Route::middleware(['auth'])->group(function () {
     | JETSTREAM PROFILE ROUTES
     |--------------------------------------------------------------------------
     */
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

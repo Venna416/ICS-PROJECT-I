@@ -14,6 +14,7 @@ class Review extends Model
         'seller_id',
         'rating',
         'comment',
+        'status',
     ];
 
     public function buyer()
