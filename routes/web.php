@@ -85,6 +85,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/buyer/profile/{id}', [BuyerProfileController::class, 'update'])->name('buyer.profile.update');
 
+    Route::get('/buyer/reports/create/{id}', [FraudReportController::class, 'create'])->name('buyer.reports.create');
+
+    Route::post('/buyer/reports', [FraudReportController::class, 'store'])->name('buyer.reports.store');
+
     /*
     |--------------------------------------------------------------------------
     | FRAUD REPORTS
