@@ -13,7 +13,7 @@ class SellerProfileController extends Controller
         return view('seller.profile.create');
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
 {
     $request->validate([
         'profile_photo' => 'nullable|image|max:2048',
@@ -28,26 +28,30 @@ class SellerProfileController extends Controller
         'description' => 'nullable|string',
     ]);
 
-   // SellerProfileController@store
-$profile = SellerProfile::create([
-    'user_id' => Auth::id(),
-    'brand_name' => $request->brand_name,
-    'business_category' => $request->category, // ✅ match migration
-    'location' => $request->location,
-    'phone_number' => $request->phone,         // ✅ match migration
-    'social_platform' => $request->social_platform,
-    'shop_link' => $request->shop_link,
-    'description' => $request->description,
-    'profile_photo' => $request->file('profile_photo')?->store('profiles', 'public'),
-    'id_front' => $request->file('id_front')?->store('ids', 'public'),
-    'id_back' => $request->file('id_back')?->store('ids', 'public'),
-    'verification_status' => 'pending',
-]);
+    $profile = SellerProfile::create([
+        'user_id' => Auth::id(),
+        'brand_name' => $request->brand_name,
+        'business_category' => $request->category, // ✅ matches migration
+        'location' => $request->location,
+        'phone_number' => $request->phone,         // ✅ matches migration
+        'social_platform' => $request->social_platform,
+        'shop_link' => $request->shop_link,
+        'description' => $request->description,
+        'profile_photo' => $request->file('profile_photo')?->store('profiles', 'public'),
+        'id_front' => $request->file('id_front')?->store('ids', 'public'),
+        'id_back' => $request->file('id_back')?->store('ids', 'public'),
 
+        // 🔹 Default verification fields
+        'verification_status' => 'pending',
+        'verified' => false,
+        'risk_score' => null,
+        'trust_score' => null,
+    ]);
 
     return redirect()->route('seller.profile.show', $profile->id)
-                     ->with('success', 'Profile saved successfully!');
+                     ->with('success', 'Profile submitted for verification. Awaiting admin review.');
 }
+
 
 
 public function show($id)
