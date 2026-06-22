@@ -1,97 +1,399 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    {{ session('success') }}
-                </div>
-            @endif
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-10">
 
-            <div class="bg-white p-6 rounded-lg shadow space-y-4">
 
-                <p><strong>Brand Name:</strong> {{ $profile->brand_name ?? 'N/A' }}</p>
+<div class="max-w-5xl mx-auto px-5">
 
-                <p><strong>Business Category:</strong>
-                    {{ $profile->business_category ?? 'N/A' }}
-                </p>
 
-                <p><strong>Location:</strong>
-                    {{ $profile->location ?? 'N/A' }}
-                </p>
+<div class="bg-white rounded-3xl shadow-xl overflow-hidden">
 
-                <p><strong>Phone Number:</strong>
-                    {{ $profile->phone_number ?? 'N/A' }}
-                </p>
 
-                <p><strong>Social Platform:</strong>
-                    {{ $profile->social_platform ?? 'N/A' }}
-                </p>
 
-                <p>
-                    <strong>Shop Link:</strong>
 
-                    @if ($profile->shop_link)
-                        <a href="{{ $profile->shop_link }}" target="_blank" class="text-blue-600 hover:underline">
-                            {{ $profile->shop_link }}
-                        </a>
-                    @else
-                        N/A
-                    @endif
-                </p>
 
-                <p>
-                    <strong>Description:</strong>
-                    {{ $profile->description ?? 'No description provided.' }}
-                </p>
+<!-- HEADER -->
 
-                <p>
-                    <strong>Verification Status:</strong>
+<div class="bg-gradient-to-r from-blue-600 to-purple-600 p-10 text-white">
 
-                    <span
-                        class="px-2 py-1 rounded
-                    {{ $profile->verification_status === 'verified'
-                        ? 'bg-green-200 text-green-800'
-                        : ($profile->verification_status === 'rejected'
-                            ? 'bg-red-200 text-red-800'
-                            : 'bg-yellow-200 text-yellow-800') }}">
-                        {{ ucfirst($profile->verification_status ?? 'Pending') }}
-                    </span>
-                </p>
 
-                @if ($profile->profile_photo)
-                    <div>
-                        <strong>Profile Photo:</strong><br>
+<div class="flex flex-col md:flex-row items-center gap-8">
 
-                        <img src="{{ asset('storage/' . $profile->profile_photo) }}" class="w-32 h-32 rounded-full mt-2">
-                    </div>
-                @endif
 
-            </div>
+@if($profile->profile_photo)
 
-            <div class="mt-6 flex gap-4">
+<img
 
-                <a href="{{ route('seller.profile.edit', $profile->id) }}"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    ✏️ Edit Profile
-                </a>
+src="{{asset('storage/'.$profile->profile_photo)}}"
 
-                <form action="{{ route('seller.profile.destroy', $profile->id) }}" method="POST"
-                    onsubmit="return confirm('Are you sure you want to delete your profile?');">
+class="w-36 h-36 rounded-full border-4 border-white shadow-lg object-cover">
 
-                    @csrf
-                    @method('DELETE')
 
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                        🗑️ Delete Profile
-                    </button>
+@else
 
-                </form>
 
-            </div>
+<div class="w-36 h-36 rounded-full bg-white/30 flex items-center justify-center text-6xl">
 
-        </div>
-    </div>
+👤
+
+</div>
+
+
+@endif
+
+
+
+
+
+<div class="text-center md:text-left">
+
+
+<h1 class="text-4xl font-bold">
+
+{{$profile->brand_name}}
+
+</h1>
+
+
+<p class="mt-3 text-lg opacity-90">
+
+{{Auth::user()->name}}
+
+</p>
+
+
+<p class="opacity-80">
+
+{{Auth::user()->email}}
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- BUSINESS PROFILE -->
+
+
+<div class="p-10">
+
+
+
+<h2 class="text-3xl font-bold text-gray-800 mb-8">
+
+🏪 Business Profile
+
+</h2>
+
+
+
+
+
+<div class="grid md:grid-cols-2 gap-6">
+
+
+
+
+
+
+<div class="bg-blue-50 rounded-2xl p-6">
+
+
+<div class="text-blue-600 text-3xl mb-3">
+
+🏷️
+
+</div>
+
+
+<h3 class="font-bold text-gray-700">
+
+Business Category
+
+</h3>
+
+
+<p class="mt-2 text-gray-600">
+
+{{$profile->business_category ?? 'Not provided'}}
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="bg-purple-50 rounded-2xl p-6">
+
+
+<div class="text-purple-600 text-3xl mb-3">
+
+📍
+
+</div>
+
+
+<h3 class="font-bold text-gray-700">
+
+Location
+
+</h3>
+
+
+<p class="mt-2 text-gray-600">
+
+{{$profile->location ?? 'Not provided'}}
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="bg-pink-50 rounded-2xl p-6">
+
+
+<div class="text-pink-600 text-3xl mb-3">
+
+📞
+
+</div>
+
+
+<h3 class="font-bold text-gray-700">
+
+Contact Number
+
+</h3>
+
+
+<p class="mt-2 text-gray-600">
+
+{{$profile->phone_number ?? 'Not provided'}}
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="bg-green-50 rounded-2xl p-6">
+
+
+<div class="text-green-600 text-3xl mb-3">
+
+🌐
+
+</div>
+
+
+<h3 class="font-bold text-gray-700">
+
+Social Platform
+
+</h3>
+
+
+<p class="mt-2 text-gray-600">
+
+{{$profile->social_platform ?? 'Not provided'}}
+
+</p>
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- SHOP LINK -->
+
+
+@if($profile->shop_link)
+
+<div class="px-10 pb-5">
+
+
+<h2 class="text-2xl font-bold mb-4">
+
+🔗 Online Store
+
+</h2>
+
+
+<a
+
+href="{{$profile->shop_link}}"
+
+target="_blank"
+
+class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700">
+
+
+Visit Shop
+
+</a>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+
+
+
+
+
+<!-- DESCRIPTION -->
+
+
+<div class="px-10 pb-10">
+
+
+<h2 class="text-2xl font-bold mb-4">
+
+📝 About The Business
+
+</h2>
+
+
+
+<div class="bg-gray-50 rounded-2xl p-6 text-gray-700 leading-relaxed">
+
+
+{{$profile->description ?? 'No business description added yet.'}}
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ACTIONS -->
+
+
+<div class="px-10 pb-10 flex gap-4">
+
+
+
+<a
+
+href="{{route('seller.profile.edit',$profile->id)}}"
+
+class="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700">
+
+
+✏️ Edit Profile
+
+
+</a>
+
+
+
+
+<form action="{{route('seller.profile.destroy',$profile->id)}}"
+
+method="POST">
+
+
+@csrf
+
+@method('DELETE')
+
+
+<button
+
+onclick="return confirm('Are you sure?')"
+
+class="bg-red-600 text-white px-8 py-3 rounded-xl">
+
+
+🗑 Delete
+
+
+</button>
+
+
+</form>
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
 @endsection

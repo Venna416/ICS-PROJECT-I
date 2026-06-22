@@ -1,84 +1,542 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">Complete Your Seller Profile</h2>
 
-    <form action="{{ route('seller.profile.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-        @csrf
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-10">
 
-        <!-- Profile Photo -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Profile Photo</label>
-            <input type="file" name="profile_photo" accept="image/*"
-                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
-        </div>
 
-        <!-- Business Details -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Brand Name</label>
-            <input type="text" name="brand_name"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
+<div class="max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl p-10">
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Business Category</label>
-            <input type="text" name="category"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Location</label>
-            <input type="text" name="location"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
+<!-- HEADER -->
 
-        <!-- Contact Info -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input type="text" name="phone"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
+<div class="text-center mb-10">
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Social Platform</label>
-            <input type="text" name="social_platform"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Shop Link</label>
-            <input type="url" name="shop_link"
-                   class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-        </div>
+<h1 class="text-4xl font-bold text-gray-800">
 
-        <!-- ID Upload -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">National ID (Front)</label>
-            <input type="file" name="id_front" accept="image/*"
-                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
-        </div>
+🛡️ Seller Verification Application
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">National ID (Back)</label>
-            <input type="file" name="id_back" accept="image/*"
-                   class="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:ring focus:ring-blue-300">
-        </div>
+</h1>
 
-        <!-- Description -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Business Description</label>
-            <textarea name="description" rows="4"
-                      class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-        </div>
 
-        <!-- Submit -->
-        <div class="flex justify-end">
-            <button type="submit"
-                    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 focus:ring focus:ring-blue-300">
-                Save Profile
-            </button>
-        </div>
-    </form>
+<p class="text-gray-500 mt-3">
+
+Complete your information to become a verified seller.
+
+</p>
+
+
 </div>
+
+
+
+
+
+<form action="{{route('seller.profile.store')}}"
+
+method="POST"
+
+enctype="multipart/form-data"
+
+class="space-y-10">
+
+
+@csrf
+
+
+
+
+
+<!-- PERSONAL INFORMATION -->
+
+
+<div class="bg-gray-50 rounded-2xl p-6 border">
+
+
+<h2 class="text-xl font-bold text-gray-800 mb-5">
+
+👤 Personal Information
+
+</h2>
+
+
+
+<div class="grid md:grid-cols-2 gap-6">
+
+
+<div>
+
+
+<label class="font-semibold">
+Full Name
+</label>
+
+
+<input
+
+type="text"
+
+value="{{Auth::user()->name}}"
+
+readonly
+
+class="mt-2 w-full rounded-xl border-gray-300 bg-gray-100 p-3">
+
+
+</div>
+
+
+
+
+<div>
+
+
+<label class="font-semibold">
+Email Address
+</label>
+
+
+<input
+
+type="email"
+
+value="{{Auth::user()->email}}"
+
+readonly
+
+class="mt-2 w-full rounded-xl border-gray-300 bg-gray-100 p-3">
+
+
+</div>
+
+
+</div>
+
+
+<p class="text-sm text-gray-500 mt-4">
+
+This information comes from your registered account.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- BUSINESS DETAILS -->
+
+
+<div class="bg-blue-50 rounded-2xl p-6">
+
+
+<h2 class="text-xl font-bold text-blue-700 mb-5">
+
+🏪 Business Information
+
+</h2>
+
+
+
+
+<div class="grid md:grid-cols-2 gap-6">
+
+
+
+<div>
+
+<label class="font-semibold">
+Brand Name
+</label>
+
+
+<input
+
+name="brand_name"
+
+placeholder="Example: Maria Fashion"
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+
+
+<div>
+
+
+<label class="font-semibold">
+Business Category
+</label>
+
+
+<input
+
+name="category"
+
+placeholder="Clothing, Electronics..."
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+
+
+
+<div>
+
+<label class="font-semibold">
+Location
+</label>
+
+
+<input
+
+name="location"
+
+placeholder="Your business location"
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+
+
+
+<div>
+
+<label class="font-semibold">
+Phone Number
+</label>
+
+
+<input
+
+name="phone"
+
+placeholder="07xxxxxxxx"
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ONLINE PRESENCE -->
+
+
+<div class="bg-purple-50 rounded-2xl p-6">
+
+
+<h2 class="text-xl font-bold text-purple-700 mb-5">
+
+🌐 Online Presence
+
+</h2>
+
+
+
+<div class="space-y-5">
+
+
+<div>
+
+<label class="font-semibold">
+Social Media Platform
+</label>
+
+
+<input
+
+name="social_platform"
+
+placeholder="TikTok, Instagram..."
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+
+
+<div>
+
+<label class="font-semibold">
+Shop Link
+
+</label>
+
+
+<input
+
+type="url"
+
+name="shop_link"
+
+placeholder="https://"
+
+class="mt-2 w-full rounded-xl border-gray-300 p-3">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- DOCUMENTS -->
+
+
+<div class="bg-green-50 rounded-2xl p-6">
+
+
+<h2 class="text-xl font-bold text-green-700 mb-5">
+
+🪪 Identity Verification
+
+</h2>
+
+
+
+<div class="grid md:grid-cols-3 gap-5">
+
+
+
+<div class="bg-white p-4 rounded-xl border">
+
+
+<label class="font-semibold">
+
+Profile Photo
+
+</label>
+
+
+<input
+
+type="file"
+
+name="profile_photo"
+
+class="mt-3 w-full">
+
+
+</div>
+
+
+
+
+
+
+<div class="bg-white p-4 rounded-xl border">
+
+
+<label>
+
+National ID Front
+
+</label>
+
+
+<input
+
+type="file"
+
+name="id_front"
+
+class="mt-3 w-full">
+
+
+</div>
+
+
+
+
+
+
+<div class="bg-white p-4 rounded-xl border">
+
+
+<label>
+
+National ID Back
+
+</label>
+
+
+<input
+
+type="file"
+
+name="id_back"
+
+class="mt-3 w-full">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- EXTRA DOCUMENTS -->
+
+
+<div class="bg-pink-50 rounded-2xl p-6">
+
+
+<h2 class="text-xl font-bold text-pink-700">
+
+📂 Supporting Evidence
+
+</h2>
+
+
+<p class="text-gray-600 text-sm mt-2">
+
+Upload extra proof that your business is legitimate.
+
+Examples:
+Business license, shop photos, certificates.
+
+</p>
+
+
+
+
+<input
+
+type="file"
+
+name="documents[]"
+
+multiple
+
+class="mt-5 w-full bg-white border-2 border-dashed rounded-xl p-4">
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- DESCRIPTION -->
+
+
+<div>
+
+
+<label class="font-semibold">
+
+About Your Business
+
+</label>
+
+
+<textarea
+
+name="description"
+
+rows="5"
+
+placeholder="Describe your business..."
+
+class="mt-3 w-full rounded-xl border-gray-300 p-4">
+
+</textarea>
+
+
+</div>
+
+
+
+
+
+
+
+
+<button
+
+class="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg hover:scale-105 transition">
+
+
+Submit Verification Request 🚀
+
+
+</button>
+
+
+
+
+
+</form>
+
+
+</div>
+
+
+</div>
+
+
 @endsection
