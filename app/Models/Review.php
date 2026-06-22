@@ -10,15 +10,20 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'seller_name',
+        'buyer_id',
+        'seller_id',
         'rating',
-        'review',
+        'comment',
+        'status',
     ];
-    public function sellerProfile()
-{
-    return $this->belongsTo(SellerProfile::class);
-}
-}
 
+    public function buyer()
+    {
+        return $this->belongsTo(User::class, 'buyer_id');
+    }
 
+    public function seller()
+    {
+        return $this->belongsTo(SellerProfile::class, 'seller_id');
+    }
+}

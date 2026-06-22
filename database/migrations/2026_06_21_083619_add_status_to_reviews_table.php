@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buyer_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->string('status')->default('active');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buyer_profiles');
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
     }
 };

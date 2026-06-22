@@ -109,12 +109,4 @@ public function update(Request $request, $id)
     return redirect()->route('seller.profile.show', $profile->id)
                      ->with('success', 'Profile updated successfully!');
 }
-
-public function destroy($id)
-{
-    $profile = SellerProfile::findOrFail($id);
-    $profile->delete();
-
-    return redirect()->route('seller.dashboard')->with('success', 'Profile deleted successfully.');
-}
 }

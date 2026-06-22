@@ -6,9 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\FraudReport;
+use App\Models\SellerProfile;
 
 class FraudReportController extends Controller
 {
+    public function create($id)
+    {
+        $seller = SellerProfile::findOrFail($id);
+        return view('buyer.reports.create', compact('seller'));
+    }
+    
+
     public function store(Request $request)
     {
         $validated = $request->validate([

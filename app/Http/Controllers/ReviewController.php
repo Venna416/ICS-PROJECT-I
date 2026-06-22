@@ -1,32 +1,69 @@
-
 <?php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Review;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $sellerId)
     {
+        $existingReview = Review::where('buyer_id', '=', Auth::id(), 'and')
+            ->where('seller_id', '=', $sellerId, 'and')
+            ->first();
+
+        if ($existingReview) {
+            return back()->with('error', 'You have already reviewed this seller.');
+        }
+
         $validated = $request->validate([
-            'seller_name' => 'required|string|max:255',
             'rating' => 'required|integer|min:1|max:5',
-            'review' => 'required|string|max:2000',
+            'comment' => 'nullable|string',
         ]);
 
-        DB::table('reviews')->insert([
-            'user_id' => Auth::id(),
-            'seller_name' => $validated['seller_name'],
+        Review::create([
+            'buyer_id' => Auth::id(),
+            'seller_id' => $sellerId,
             'rating' => $validated['rating'],
-            'review' => $validated['review'],
-            'created_at' => now(),
-            'updated_at' => now(),
+            'comment' => $validated['comment'] ?? null,
         ]);
 
-        return redirect()->route('buyer.reviews')->with('success', 'Review submitted successfully!');
+        return back()->with('success', 'Review submitted successfully.');
+    }
+
+    public function edit($id)
+    {
+        $review = Review::findOrFail($id);
+
+        if ($review->buyer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('buyer.edit-review', compact('review'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $review = Review::findOrFail($id);
+
+        if ($review->buyer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string',
+        ]);
+
+        $review->update([
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('buyer.seller.details', ['id' => $review->seller_id])
+            ->with('success', 'Review updated successfully.');
     }
 }
-
