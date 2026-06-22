@@ -37,14 +37,18 @@ class BuyerProfileController extends Controller
     // Show profile
     public function show($id)
     {
-        $profile = BuyerProfile::findOrFail($id);
+       $profile = BuyerProfile::findOrFail($id);
+
         return view('buyer.profile.show', compact('profile'));
+        
     }
 
     // Show edit form
     public function edit($id)
     {
         $profile = BuyerProfile::findOrFail($id);
+                 
+
         return view('buyer.profile.edit', compact('profile'));
     }
 
@@ -66,6 +70,7 @@ class BuyerProfileController extends Controller
     $profile->phone_number = $request->phone_number;
     $profile->location = $request->location;
     $profile->email = Auth::user()->email; // keep synced
+
     $profile->save();
 
     return redirect()->route('buyer.profile.show', $profile->id)

@@ -89,6 +89,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/buyer/reports', [FraudReportController::class, 'store'])->name('buyer.reports.store');
 
+
+    Route::delete('/buyer/profile/{id}', [BuyerProfileController::class, 'destroy'])->name('buyer.profile.destroy');
+
     /*
     |--------------------------------------------------------------------------
     | FRAUD REPORTS
