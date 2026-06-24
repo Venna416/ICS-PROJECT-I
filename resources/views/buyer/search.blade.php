@@ -1,97 +1,370 @@
 @extends('layouts.app')
 
 @section('content')
-    <div
-        class="max-w-6xl mx-auto mt-10 p-8 rounded-2xl shadow-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white">
 
-        <h2 class="text-4xl font-bold mb-8 text-center">
-            🔎 Search Sellers
-        </h2>
 
-        <!-- Search Form -->
-        <form action="{{ route('buyer.search') }}" method="GET" class="flex justify-center mb-10">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 p-8">
 
-            <input type="text" name="search" value="{{ request('search') }}"
-                placeholder="Enter seller name, category, or location..."
-                class="w-2/3 px-6 py-3 rounded-l-lg border-none text-gray-900">
 
-            <button type="submit" class="px-8 py-3 bg-yellow-400 text-gray-900 font-bold rounded-r-lg">
-                Search
-            </button>
+<div class="max-w-7xl mx-auto">
 
-        </form>
 
-        <!-- Search Results -->
-        @if ($sellers->count())
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                @foreach ($sellers as $seller)
-                    <div class="bg-gradient-to-r from-green-400 to-blue-500 p-6 rounded-xl shadow-lg">
+<!-- TITLE -->
 
-                        <h3 class="text-2xl font-bold mb-2">
-                            {{ $seller->brand_name }}
-                        </h3>
+<div class="mb-8">
 
-                        <p>
-                            <strong>Category:</strong>
-                            {{ $seller->business_category }}
-                        </p>
 
-                        <p>
-                            <strong>Location:</strong>
-                            {{ $seller->location }}
-                        </p>
+<h1 class="text-4xl font-bold text-gray-800">
 
-                        <p>
-                            <strong>Phone:</strong>
-                            {{ $seller->phone_number }}
-                        </p>
+🔎 Verified Sellers Directory
 
-                        <!-- Verification Badge -->
-                        <p class="mt-2">
-                            <span
-                                class="px-3 py-1 rounded-full text-sm font-semibold
-                            {{ $seller->verification_status === 'verified' ? 'bg-yellow-300 text-gray-900' : 'bg-red-500 text-white' }}">
-                                {{ ucfirst($seller->verification_status) }}
-                            </span>
-                        </p>
+</h1>
 
-                        <!-- Trust Score -->
-                        <p class="mt-2">
-                            <strong>Trust Score:</strong>
-                            {{ $seller->trust_score ?? 'Not Available' }}
-                        </p>
 
-                        <!-- Risk Level -->
-                        <p class="mt-2">
-                            <strong>Risk Level:</strong>
-                            {{ $seller->risk_level ?? 'Not Available' }}
-                        </p>
+<p class="text-gray-500 mt-2">
 
-                        <!-- Actions -->
-                        <div class="flex gap-3 mt-4">
+Search trusted sellers and check their verification information.
 
-                            <a href="{{ route('buyer.seller.details', $seller->id) }}"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                👁️ View Details
-                            </a>
+</p>
 
-                            <a href="{{ route('buyer.reports.create', $seller->id) }}"
-                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                🚨 Report Fraud
-                            </a>
 
-                        </div>
+</div>
 
-                    </div>
-                @endforeach
 
-            </div>
-        @elseif(request()->filled('search'))
-            <p class="text-center text-lg font-semibold">
-                No sellers found.
-            </p>
-        @endif
 
-    </div>
+
+
+
+
+<!-- SEARCH -->
+
+<div class="bg-white rounded-3xl shadow-lg p-6 mb-8">
+
+
+<input
+
+
+id="sellerSearch"
+
+
+type="text"
+
+
+placeholder="Search seller or brand name..."
+
+
+class="w-full px-6 py-4 rounded-2xl border
+
+focus:ring-2 focus:ring-purple-500 outline-none"
+
+
+
+>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- TABLE -->
+
+<div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+
+
+
+<table class="w-full text-left">
+
+
+<thead class="bg-gradient-to-r from-blue-700 to-purple-700 text-white">
+
+
+<tr>
+
+
+<th class="p-5">
+
+Brand Name
+
+</th>
+
+
+<th class="p-5">
+
+Seller Name
+
+</th>
+
+
+
+<th class="p-5">
+
+Verification
+
+</th>
+
+
+
+<th class="p-5">
+
+Trust Score
+
+</th>
+
+
+
+<th class="p-5">
+
+Risk Score
+
+</th>
+
+
+
+<th class="p-5">
+
+Action
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+<tbody id="sellerTable">
+
+
+
+@foreach($sellers as $seller)
+
+
+
+<tr class="seller-row border-b hover:bg-blue-50 transition"
+
+
+data-search="
+
+{{$seller->brand_name}}
+
+{{$seller->user->name ?? ''}}
+
+"
+
+>
+
+
+
+<td class="p-5 font-bold text-gray-800">
+
+
+{{$seller->brand_name}}
+
+
+</td>
+
+
+
+
+
+<td class="p-5 text-gray-600">
+
+
+{{$seller->user->name ?? 'Seller'}}
+
+
+</td>
+
+
+
+
+
+
+<td class="p-5">
+
+
+<span class="px-4 py-2 rounded-full
+
+bg-green-100 text-green-700 font-bold">
+
+
+✓ Verified
+
+
+</span>
+
+
+</td>
+
+
+
+
+
+
+
+<td class="p-5">
+
+
+<span class="font-bold text-purple-600">
+
+
+{{$seller->trust_score}}%
+
+
+</span>
+
+
+</td>
+
+
+
+
+
+
+
+
+<td class="p-5">
+
+
+<span class="font-bold text-red-600">
+
+
+{{$seller->risk_score}} / 10
+
+
+</span>
+
+
+</td>
+
+
+
+
+
+
+
+
+<td class="p-5">
+
+
+<a href="{{route('buyer.seller.reviews',$seller->id)}}"
+
+
+class="px-5 py-2 rounded-xl
+
+bg-gradient-to-r from-blue-600 to-purple-600
+
+text-white font-bold">
+
+
+View Reviews
+
+
+</a>
+
+
+</td>
+
+
+
+
+</tr>
+
+
+
+
+@endforeach
+
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+const search = document.getElementById('sellerSearch');
+
+
+const rows = document.querySelectorAll('.seller-row');
+
+
+
+search.addEventListener('keyup', function(){
+
+
+let value = this.value.toLowerCase();
+
+
+
+rows.forEach(row=>{
+
+
+let text = row.dataset.search.toLowerCase();
+
+
+
+if(text.includes(value)){
+
+
+row.style.display="table-row";
+
+
+}
+
+else{
+
+
+row.style.display="none";
+
+
+}
+
+
+});
+
+
+});
+
+
+
+</script>
+
+
+
 @endsection

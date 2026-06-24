@@ -2,152 +2,161 @@
 
 @section('content')
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col">
 
+<div class="min-h-screen 
+bg-gradient-to-br from-slate-100 via-purple-50 to-red-50 
+py-12 px-5">
 
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50
 
-    bg-gradient-to-r from-blue-600 to-pink-500
+<div class="max-w-4xl mx-auto">
 
-    text-white shadow-md">
 
 
-        <div class="max-w-7xl mx-auto px-6 py-3">
+{{-- SUCCESS MESSAGE --}}
 
+@if(session('success'))
 
-            <h1 class="text-xl font-bold tracking-wide">
+<div class="mb-6 bg-white border-l-4 border-green-500 
+rounded-2xl shadow p-5">
 
-                🚨 Report Fraud
+<div class="flex gap-4 items-center">
 
-            </h1>
 
+<div class="text-3xl">
+✅
+</div>
 
-        </div>
 
+<div>
 
-    </header>
+<h3 class="font-bold text-green-700">
+Report Submitted
+</h3>
 
 
+<p class="text-gray-600">
+{{session('success')}}
+</p>
 
 
+</div>
 
-    <!-- Main Content -->
 
-    <main class="flex-1 flex justify-center items-center
+</div>
 
-    px-5 pt-20 pb-20">
+</div>
 
+@endif
 
-        <div class="w-full max-w-3xl
 
-        bg-white rounded-3xl shadow-2xl
 
-        p-8 md:p-10">
 
 
+{{-- ERROR MESSAGE --}}
 
+@if(session('error'))
 
+<div class="mb-6 bg-white border-l-4 border-red-500 
+rounded-2xl shadow p-5">
 
-            <!-- Title -->
 
-            <div class="text-center mb-8">
+<div class="flex gap-4 items-center">
 
 
-                <div class="inline-flex items-center justify-center
+<div class="text-3xl">
+⚠️
+</div>
 
-                w-16 h-16 rounded-full
 
-                bg-gradient-to-r from-blue-600 to-pink-500
+<p class="text-red-700 font-semibold">
 
-                text-white text-3xl mb-4">
+{{session('error')}}
 
+</p>
 
-                    🚨
 
+</div>
 
-                </div>
 
+</div>
 
 
-                <h2 class="text-3xl font-bold
+@endif
 
-                bg-gradient-to-r from-blue-600 to-pink-500
 
-                bg-clip-text text-transparent">
 
 
-                    Help Protect Buyers
 
 
-                </h2>
 
+<!-- MAIN CARD -->
 
 
-                <p class="text-gray-500 mt-3">
+<div class="bg-white rounded-3xl shadow-xl overflow-hidden">
 
-                    Report suspicious sellers and help keep the marketplace safe.
 
-                </p>
 
 
-            </div>
 
 
+<!-- TOP SECTION -->
 
 
+<div class="bg-gradient-to-r 
+from-red-600 
+to-purple-700
 
+p-10 text-white">
 
 
 
-            <form action="{{ route('buyer.reports.store') }}"
+<div class="flex items-center gap-5">
 
-            method="POST"
 
-            enctype="multipart/form-data">
+<div class="w-16 h-16 
+rounded-full 
+bg-white/20
 
+flex items-center justify-center
 
-                @csrf
+text-4xl">
 
 
+🚨
 
 
+</div>
 
-                <!-- Seller Name -->
 
-                <div class="mb-5">
 
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+<div>
 
-                        Seller Name
 
-                    </label>
+<h1 class="text-4xl font-bold">
 
+Report Suspicious Seller
 
+</h1>
 
-                    <input
 
-                    type="text"
+<p class="mt-2 text-red-100">
 
-                    name="seller_name"
+Help protect buyers by reporting fraudulent activities.
 
+</p>
 
-                    class="w-full px-4 py-3 rounded-xl
 
-                    border border-gray-200
 
-                    focus:ring-2 focus:ring-pink-400
+</div>
 
-                    focus:outline-none"
 
+</div>
 
-                    placeholder="Enter seller name"
 
-                    required>
 
+</div>
 
-                </div>
 
 
 
@@ -155,296 +164,397 @@
 
 
 
+<div class="p-8 md:p-10">
 
-                <!-- Shop Name -->
 
-                <div class="mb-5">
 
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        Shop Name
+<!-- GUIDELINES -->
 
-                    </label>
 
+<div class="bg-gray-50 rounded-2xl p-6 mb-10">
 
 
-                    <input
+<h2 class="text-xl font-bold text-gray-800 mb-5">
 
-                    type="text"
+🔒 Before submitting a report
 
-                    name="shop_name"
+</h2>
 
 
-                    class="w-full px-4 py-3 rounded-xl
 
-                    border border-gray-200
+<div class="grid md:grid-cols-3 gap-4">
 
-                    focus:ring-2 focus:ring-pink-400
 
-                    focus:outline-none"
 
+<div class="bg-white rounded-xl p-4 shadow-sm">
 
-                    placeholder="Enter shop/business name"
 
-                    required>
+<h3 class="font-bold text-red-600">
 
+✓ Be Accurate
 
-                </div>
+</h3>
 
 
+<p class="text-sm text-gray-600 mt-2">
 
+Only report real suspicious activities.
 
+</p>
 
 
+</div>
 
-                <!-- Shop Link -->
 
-                <div class="mb-5">
 
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        Shop Link
+<div class="bg-white rounded-xl p-4 shadow-sm">
 
-                    </label>
 
+<h3 class="font-bold text-purple-600">
 
+✓ Add Evidence
 
+</h3>
 
-                    <input
 
-                    type="url"
+<p class="text-sm text-gray-600 mt-2">
 
-                    name="shop_link"
+Screenshots and proof help investigation.
 
+</p>
 
-                    class="w-full px-4 py-3 rounded-xl
 
-                    border border-gray-200
+</div>
 
-                    focus:ring-2 focus:ring-pink-400
 
-                    focus:outline-none"
 
 
-                    placeholder="https://example.com"
 
-                    required>
+<div class="bg-white rounded-xl p-4 shadow-sm">
 
 
+<h3 class="font-bold text-blue-600">
 
-                </div>
+✓ Protect Buyers
 
+</h3>
 
 
+<p class="text-sm text-gray-600 mt-2">
 
+Your report improves marketplace safety.
 
+</p>
 
 
+</div>
 
 
-                <!-- Fraud Description -->
 
+</div>
 
-                <div class="mb-5">
 
+</div>
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        What happened?
 
-                    </label>
 
 
 
-                    <textarea
 
-                    name="description"
 
-                    rows="5"
 
+<form action="{{route('buyer.reports.store')}}"
 
-                    class="w-full px-4 py-3 rounded-xl
+method="POST"
 
-                    border border-gray-200
+enctype="multipart/form-data">
 
-                    resize-none
 
-                    focus:ring-2 focus:ring-pink-400
+@csrf
 
-                    focus:outline-none"
 
 
-                    placeholder="Explain the fraud situation..."
 
-                    required></textarea>
 
 
+<!-- SELLER NAME -->
 
-                </div>
 
+<div class="mb-6">
 
 
+<label class="font-semibold text-gray-700">
 
+Seller Name
 
+</label>
 
 
+<input
 
-                <!-- Evidence Upload -->
+type="text"
 
-                <div class="mb-5
+name="seller_name"
 
-                bg-gradient-to-r from-blue-50 to-pink-50
+class="mt-2 w-full rounded-xl border-gray-300
 
-                rounded-2xl p-5">
+p-4 focus:ring-2 focus:ring-red-400"
 
+placeholder="Enter seller name"
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+required>
 
-                        📎 Upload Evidence
 
-                    </label>
+</div>
 
 
 
-                    <input
 
-                    type="file"
 
-                    name="evidence"
 
 
-                    class="w-full px-4 py-3 rounded-xl
 
-                    bg-white
 
-                    border border-gray-200
+<!-- BRAND NAME -->
 
-                    focus:ring-2 focus:ring-pink-400"
 
+<div class="mb-6">
 
-                    accept="image/*,.pdf,.doc,.docx">
 
+<label class="font-semibold text-gray-700">
 
+Brand / Business Name
 
-                    <p class="text-sm text-gray-500 mt-2">
+</label>
 
-                        Accepted: Images, PDF, Word documents
 
-                    </p>
+<input
 
+type="text"
 
-                </div>
+name="brand_name"
 
+class="mt-2 w-full rounded-xl border-gray-300
 
+p-4 focus:ring-2 focus:ring-red-400"
 
+placeholder="Enter brand name"
 
+required>
 
 
+</div>
 
 
 
-                <!-- Contact -->
 
-                <div class="mb-7">
 
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        Your Contact
 
-                    </label>
 
+<!-- SHOP LINK -->
 
 
-                    <input
+<div class="mb-6">
 
-                    type="text"
 
-                    name="contact"
+<label class="font-semibold text-gray-700">
 
+Shop Link
 
-                    class="w-full px-4 py-3 rounded-xl
+</label>
 
-                    border border-gray-200
 
-                    focus:ring-2 focus:ring-pink-400
+<input
 
-                    focus:outline-none"
+type="url"
 
+name="shop_link"
 
-                    placeholder="Email or phone number"
+class="mt-2 w-full rounded-xl border-gray-300
 
-                    required>
+p-4 focus:ring-2 focus:ring-red-400"
 
+placeholder="https://example.com"
 
-                </div>
+required>
 
 
+</div>
 
 
 
 
 
 
-                <!-- Submit -->
 
 
-                <button
 
-                type="submit"
+<!-- DESCRIPTION -->
 
 
-                class="w-full py-3 rounded-xl
+<div class="mb-6">
 
-                bg-gradient-to-r from-blue-600 to-pink-500
 
-                hover:from-blue-700 hover:to-pink-600
+<label class="font-semibold text-gray-700">
 
-                text-white font-bold text-lg
+Explain the problem
 
-                shadow-lg transition duration-300">
+</label>
 
 
-                    Submit Fraud Report 🚨
+<textarea
 
+name="description"
 
-                </button>
+rows="5"
 
+class="mt-2 w-full rounded-xl border-gray-300
 
+p-4 resize-none focus:ring-2 focus:ring-red-400"
 
 
+placeholder="Describe what happened..."
 
-            </form>
+required></textarea>
 
 
 
+</div>
 
-        </div>
 
 
-    </main>
 
 
 
 
 
 
+<!-- EVIDENCE -->
 
-    <!-- Footer -->
 
-    <footer class="fixed bottom-0 left-0 right-0
+<div class="mb-6 
+bg-red-50 rounded-2xl p-6">
 
-    bg-gradient-to-r from-blue-600 to-pink-500
 
-    text-white text-center py-3 text-sm">
+<label class="font-semibold text-gray-700">
 
+📎 Upload Evidence
 
-        © 2026 Online Seller Verification
+</label>
 
 
-    </footer>
+<input
+
+type="file"
+
+name="evidence"
+
+class="mt-3 w-full bg-white rounded-xl p-3"
+
+
+accept="image/*,.pdf,.doc,.docx">
+
+
+<p class="text-sm text-gray-500 mt-2">
+
+Images, PDF and documents accepted.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- CONTACT -->
+
+
+<div class="mb-8">
+
+
+<label class="font-semibold text-gray-700">
+
+Your Contact
+
+</label>
+
+
+<input
+
+type="text"
+
+name="contact"
+
+class="mt-2 w-full rounded-xl border-gray-300
+
+p-4 focus:ring-2 focus:ring-red-400"
+
+
+placeholder="Email or phone number"
+
+required>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- BUTTON -->
+
+
+<button
+
+type="submit"
+
+class="w-full py-4 rounded-xl
+
+bg-gradient-to-r from-red-600 to-purple-700
+
+text-white font-bold text-lg
+
+shadow-lg hover:opacity-90 transition">
+
+
+Submit Fraud Report 🚨
+
+
+</button>
+
+
+
+
+
+</form>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
 
 
 

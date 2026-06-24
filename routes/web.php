@@ -214,55 +214,57 @@ Route::delete('/buyer/profile/{id}',
 
 Route::get('/buyer/search',function(){
 
-
-$search=request('search');
-
+    $search = request('search');
 
 
-$sellers = SellerProfile::query()
+    $sellers = SellerProfile::where(
+        'verification_status',
+        'verified'
+    )
 
 
-->when($search,function($query)use($search){
+    ->when($search, function($query) use ($search){
 
 
-$query
-
-->where('brand_name','like',"%$search%")
-
-->orWhere(
-'business_category',
-'like',
-"%$search%"
-)
-
-->orWhere(
-'location',
-'like',
-"%$search%"
-);
+        $query->where(function($q) use ($search){
 
 
+            $q->where(
+                'brand_name',
+                'LIKE',
+                "%".$search."%"
+            )
 
-})
+            ->orWhere(
+                'business_category',
+                'LIKE',
+                "%".$search."%"
+            )
 
-->get();
+            ->orWhere(
+                'location',
+                'LIKE',
+                "%".$search."%"
+            );
+
+
+        });
+
+
+    })
+
+
+    ->get();
 
 
 
-return view(
-'buyer.search',
-compact('sellers')
-);
-
+    return view(
+        'buyer.search',
+        compact('sellers')
+    );
 
 
 })->name('buyer.search');
-
-
-
-
-
-
 
 
 
@@ -273,12 +275,13 @@ compact('sellers')
 */
 
 
+Route::get('/buyer/reviews',function(){
 
-Route::get('/buyer/reviews',
 
-fn()=>view('buyer.reviews')
+return view('buyer.reviews');
 
-)->name('buyer.reviews');
+
+})->name('buyer.reviews');
 
 
 
@@ -294,7 +297,11 @@ Route::post('/buyer/reviews',
 
 
 
+Route::get('/review/success',
 
+[ReviewController::class,'success']
+
+)->name('review.success');
 
 
 
@@ -305,12 +312,16 @@ Route::post('/buyer/reviews',
 */
 
 
-
 Route::get('/buyer/reports',
 
-fn()=>view('buyer.reports')
+function(){
+
+    return view('buyer.reports');
+
+}
 
 )->name('buyer.reports');
+
 
 
 
@@ -325,8 +336,22 @@ Route::post('/buyer/reports',
 
 
 
+/*
+|--------------------------------------------------------------------------
+| FRAUD REPORT SUCCESS PAGE
+|--------------------------------------------------------------------------
+*/
 
 
+Route::get('/buyer/report/success',
+
+function(){
+
+    return view('buyer.report-success');
+
+}
+
+)->name('buyer.report.success');
 
 
 /*
@@ -334,7 +359,6 @@ Route::post('/buyer/reports',
 | SELLER
 |--------------------------------------------------------------------------
 */
-
 
 
 Route::get('/seller/dashboard',
@@ -345,6 +369,61 @@ Route::get('/seller/dashboard',
 
 
 
+
+
+/*
+|--------------------------------------------------------------------------
+| SELLER REVIEWS
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('/seller/reviews',
+
+function(){
+
+
+    $seller = Auth::user()->sellerProfile;
+
+
+    $reviews = \App\Models\Review::where(
+
+        'brand_name',
+
+        $seller->brand_name
+
+    )
+
+    ->latest()
+
+    ->get();
+
+
+
+    return view(
+
+        'seller.reviews',
+
+        compact('reviews')
+
+    );
+
+
+}
+
+)->name('seller.reviews');
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| SELLER PROFILE
+|--------------------------------------------------------------------------
+*/
 
 
 Route::get('/seller/profile/create',
@@ -367,11 +446,13 @@ Route::post('/seller/profile/store',
 
 
 
+
 Route::get('/seller/profile/{id}',
 
 [SellerProfileController::class,'show']
 
 )->name('seller.profile.show');
+
 
 
 
@@ -387,11 +468,13 @@ Route::get('/seller/profile/{id}/edit',
 
 
 
+
 Route::put('/seller/profile/{id}',
 
 [SellerProfileController::class,'update']
 
 )->name('seller.profile.update');
+
 
 
 
@@ -456,7 +539,54 @@ Route::get('/buyer/seller/{id}',
 
 
 
+/*
+|--------------------------------------------------------------------------
+| BUYER VIEW SELLER REVIEWS
+|--------------------------------------------------------------------------
+*/
 
+
+Route::get('/buyer/seller/{id}/reviews',
+
+function($id){
+
+
+    $seller = SellerProfile::findOrFail($id);
+
+
+
+    $reviews = \App\Models\Review::where(
+
+        'brand_name',
+
+        $seller->brand_name
+
+    )
+
+    ->latest()
+
+    ->get();
+
+
+
+    return view(
+
+        'buyer.seller-reviews',
+
+        compact(
+
+            'seller',
+
+            'reviews'
+
+        )
+
+    );
+
+
+}
+
+)->name('buyer.seller.reviews');
 
 
 
@@ -475,67 +605,123 @@ Route::middleware('is_admin')->group(function(){
 
 
 
+    // Dashboard
 
+    Route::get('/admin/dashboard',
 
-Route::get('/admin/dashboard',
+    [AdminController::class,'index'])
 
-[AdminController::class,'index']
-
-)->name('admin.dashboard');
-
-
-
-
-
-
-Route::get('/admin/pending',
-
-[AdminController::class,'pending']
-
-)->name('admin.pending');
+    ->name('admin.dashboard');
 
 
 
 
+    // Pending sellers
 
-Route::get('/admin/verified',
+    Route::get('/admin/pending',
 
-[AdminController::class,'verified']
+    [AdminController::class,'pending'])
 
-)->name('admin.verified');
-
-
-
-
-
-Route::get('/admin/rejected',
-
-[AdminController::class,'rejected']
-
-)->name('admin.rejected');
+    ->name('admin.pending');
 
 
 
 
+    // Verified sellers
 
-Route::get('/admin/seller/{id}',
+    Route::get('/admin/verified',
 
-[AdminController::class,'showSeller']
+    [AdminController::class,'verified'])
 
-)->name('admin.seller.show');
+    ->name('admin.verified');
+
+
+
+
+    // Rejected sellers
+
+    Route::get('/admin/rejected',
+
+    [AdminController::class,'rejected'])
+
+    ->name('admin.rejected');
 
 
 
 
 
-Route::post('/admin/sellers/{id}/verify',
+    // Full seller review
 
-[AdminController::class,'verifySeller']
+    Route::get('/admin/seller/{id}',
 
-)->name('admin.verifySeller');
+    [AdminController::class,'showSeller'])
+
+    ->name('admin.seller.show');
 
 
 
+
+
+    // Approve / reject
+
+    Route::post('/admin/sellers/{id}/verify',
+
+    [AdminController::class,'verifySeller'])
+
+    ->name('admin.verifySeller');
+
+
+
+
+
+
+    // Edit verification
+
+    Route::get('/admin/seller/{id}/edit',
+
+    [AdminController::class,'editVerification'])
+
+    ->name('admin.editVerification');
+
+
+
+
+
+
+    // Update verification
+
+    Route::put('/admin/seller/{id}/update',
+
+    [AdminController::class,'updateVerification'])
+
+    ->name('admin.updateVerification');
+   
+    // Buyer Reviews
+
+Route::get('/admin/reviews',
+
+[AdminController::class,'reviews'])
+
+->name('admin.reviews');
+
+
+
+
+
+// Fraud Reports
+
+Route::get('/admin/fraud-reports',
+
+[AdminController::class,'fraudReports'])
+
+->name('admin.fraudReports');
+
+
+Route::get('/admin/fraud-report/{id}',
+
+[AdminController::class,'showFraud'])
+
+->name('admin.fraud.show');
 
 });
 
@@ -543,6 +729,13 @@ Route::post('/admin/sellers/{id}/verify',
 
 
 
+
+
+/*
+|--------------------------------------------------------------------------
+| REGULATOR
+|--------------------------------------------------------------------------
+*/
 
 
 

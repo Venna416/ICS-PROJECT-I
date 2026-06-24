@@ -2,363 +2,516 @@
 
 @section('content')
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col">
 
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-10 px-5">
 
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 
-    bg-gradient-to-r from-blue-600 to-pink-500 
-    text-white shadow-md">
 
+<div class="max-w-5xl mx-auto">
 
-        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center">
 
 
-            <h1 class="text-xl font-bold tracking-wide">
 
-                ⭐ Write a Review
 
-            </h1>
+{{-- SUCCESS --}}
 
+@if(session('success'))
 
-        </div>
+<div class="mb-6 bg-white rounded-2xl shadow p-5 border-l-4 border-purple-500">
 
 
-    </header>
+<div class="flex items-center gap-3">
 
 
+<span class="text-3xl">
+✓
+</span>
 
 
-    <!-- Content -->
+<div>
 
-    <main class="flex-1 flex justify-center items-center 
-    px-5 pt-20 pb-20">
+<h3 class="font-bold text-purple-700">
+Success
+</h3>
 
 
-        <div class="w-full max-w-3xl 
-        bg-white rounded-3xl shadow-2xl 
-        p-8 md:p-10">
+<p class="text-gray-600">
+{{session('success')}}
+</p>
 
 
-            <!-- Title -->
+</div>
 
-            <div class="text-center mb-8">
 
+</div>
 
-                <div class="inline-flex items-center justify-center 
-                w-16 h-16 rounded-full 
-                bg-gradient-to-r from-blue-600 to-pink-500 
-                text-white text-3xl mb-4">
 
-                    ⭐
+</div>
 
-                </div>
+@endif
 
 
 
-                <h2 class="text-3xl font-bold 
-                bg-gradient-to-r from-blue-600 to-pink-500 
-                bg-clip-text text-transparent">
 
-                    Share Your Experience
 
-                </h2>
 
 
+{{-- ERROR --}}
 
-                <p class="text-gray-500 mt-3">
+@if(session('error'))
 
-                    Your review helps buyers make safer decisions 
-                    and improves seller trust.
+<div class="mb-6 bg-white rounded-2xl shadow p-5 border-l-4 border-red-500">
 
-                </p>
 
+<div class="flex items-center gap-3">
 
-            </div>
 
+<span class="text-3xl">
+⚠️
+</span>
 
 
+<div>
 
+<h3 class="font-bold text-red-700">
+Notice
+</h3>
 
 
-            <form action="{{ route('buyer.reviews.store') }}" method="POST">
+<p class="text-gray-600">
+{{session('error')}}
+</p>
 
-                @csrf
 
+</div>
 
 
+</div>
 
-                <!-- Seller Name -->
 
-                <div class="mb-5">
+</div>
 
+@endif
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        Seller Name
 
-                    </label>
 
 
-                    <input 
-                    type="text"
-                    name="seller_name"
 
-                    class="w-full px-4 py-3 rounded-xl
-                    border border-gray-200
-                    focus:ring-2 focus:ring-pink-400
-                    focus:outline-none"
 
-                    placeholder="Enter seller name"
-                    required>
 
 
-                </div>
 
+{{-- HEADER --}}
 
 
+<div class="bg-gradient-to-r from-blue-600 to-pink-500 rounded-3xl shadow-xl p-10 text-white mb-8">
 
 
-                <!-- Shop Name -->
+<h1 class="text-4xl font-bold">
 
+⭐ Seller Experience Review
 
-                <div class="mb-5">
+</h1>
 
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+<p class="mt-3 text-blue-50 text-lg">
 
-                        Shop Name
+Help other buyers make safer decisions by sharing your honest experience.
 
-                    </label>
+</p>
 
 
-                    <input 
-                    type="text"
-                    name="shop_name"
+</div>
 
-                    class="w-full px-4 py-3 rounded-xl
-                    border border-gray-200
-                    focus:ring-2 focus:ring-pink-400
-                    focus:outline-none"
 
-                    placeholder="Enter shop/business name"
-                    required>
 
 
-                </div>
 
 
 
 
 
+{{-- GUIDELINES FIRST --}}
 
-                <!-- Link -->
 
-                <div class="mb-5">
 
+<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
 
-                        Shop Link
+<h2 class="text-2xl font-bold text-gray-800 mb-5">
 
-                    </label>
+🔒 Review Guidelines
 
+</h2>
 
-                    <input 
 
-                    type="url"
-                    name="shop_link"
 
+<div class="grid md:grid-cols-2 gap-5">
 
-                    class="w-full px-4 py-3 rounded-xl
-                    border border-gray-200
-                    focus:ring-2 focus:ring-pink-400
-                    focus:outline-none"
 
 
-                    placeholder="https://example.com"
-                    required>
+<div class="bg-blue-50 rounded-xl p-5">
 
+<h3 class="font-bold text-blue-700">
 
-                </div>
+✓ Be Honest
 
+</h3>
 
+<p class="text-gray-600 mt-2">
 
+Share your real buying experience with the seller.
 
+</p>
 
+</div>
 
 
 
-                <!-- Rating Card -->
 
 
-                <div class="mb-5 
-                bg-gradient-to-r from-blue-50 to-pink-50
-                rounded-2xl p-5">
+<div class="bg-purple-50 rounded-xl p-5">
 
+<h3 class="font-bold text-purple-700">
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+✓ Help Buyers
 
-                        ⭐ Rate this seller
+</h3>
 
-                    </label>
+<p class="text-gray-600 mt-2">
 
+Your feedback helps others identify trusted sellers.
 
-                    <select
+</p>
 
-                    name="rating"
+</div>
 
-                    class="w-full px-4 py-3 rounded-xl
-                    border border-gray-200
-                    bg-white
-                    focus:ring-2 focus:ring-pink-400
-                    focus:outline-none"
 
-                    required>
 
 
-                        <option value="">
-                            Select rating
-                        </option>
 
-                        <option value="1">
-                            ⭐ Very Poor
-                        </option>
 
+<div class="bg-pink-50 rounded-xl p-5">
 
-                        <option value="2">
-                            ⭐⭐ Poor
-                        </option>
+<h3 class="font-bold text-pink-700">
 
+✓ Keep It Fair
 
-                        <option value="3">
-                            ⭐⭐⭐ Average
-                        </option>
+</h3>
 
+<p class="text-gray-600 mt-2">
 
-                        <option value="4">
-                            ⭐⭐⭐⭐ Good
-                        </option>
+Avoid false information or harmful comments.
 
+</p>
 
-                        <option value="5">
-                            ⭐⭐⭐⭐⭐ Excellent
-                        </option>
+</div>
 
 
-                    </select>
 
 
-                </div>
 
 
+<div class="bg-gray-50 rounded-xl p-5">
 
+<h3 class="font-bold text-gray-700">
 
+✓ Verification Support
 
+</h3>
 
+<p class="text-gray-600 mt-2">
 
+Reviews contribute to seller trust evaluation.
 
-                <!-- Review Text -->
+</p>
 
-
-                <div class="mb-7">
-
-
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-
-                        Your Review
-
-                    </label>
-
-
-                    <textarea
-
-                    name="review"
-
-                    rows="5"
-
-
-                    class="w-full px-4 py-3 rounded-xl
-                    border border-gray-200
-                    resize-none
-
-                    focus:ring-2 focus:ring-pink-400
-                    focus:outline-none"
-
-
-                    placeholder="Tell other buyers about your experience..."
-                    required></textarea>
-
-
-                </div>
-
-
-
-
-
-
-
-
-                <!-- Button -->
-
-                <button
-
-                type="submit"
-
-
-                class="w-full py-3 rounded-xl
-
-                bg-gradient-to-r from-blue-600 to-pink-500
-
-                hover:from-blue-700 hover:to-pink-600
-
-                text-white font-bold text-lg
-
-                shadow-lg transition duration-300">
-
-
-                    Submit Review ✨
-
-
-                </button>
-
-
-
-
-
-            </form>
-
-
-
-        </div>
-
-
-
-    </main>
-
-
-
-
-
-
-    <!-- Footer -->
-
-
-    <footer class="fixed bottom-0 left-0 right-0
-
-    bg-gradient-to-r from-blue-600 to-pink-500
-
-    text-white text-center py-3 text-sm">
-
-
-        © 2026 Online Seller Verification
-
-
-    </footer>
+</div>
 
 
 
 </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- REVIEW FORM --}}
+
+
+
+<div class="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+
+
+
+
+
+<div class="text-center mb-8">
+
+
+<div class="w-20 h-20 mx-auto rounded-full 
+
+bg-gradient-to-r from-blue-600 to-pink-500
+
+flex items-center justify-center
+
+text-white text-4xl shadow-lg">
+
+
+⭐
+
+
+</div>
+
+
+
+
+<h2 class="text-3xl font-bold mt-5 text-gray-800">
+
+Write Your Review
+
+</h2>
+
+
+
+<p class="text-gray-500 mt-2">
+
+Your feedback improves trust and transparency.
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<form action="{{route('buyer.reviews.store')}}" method="POST">
+
+@csrf
+
+
+
+
+
+{{-- SELLER NAME --}}
+
+
+<div class="mb-6">
+
+
+<label class="font-semibold">
+
+Seller Name
+
+</label>
+
+
+<input
+
+name="seller_name"
+
+class="w-full p-3 border rounded-xl"
+
+placeholder="Seller owner name"
+
+required>
+
+
+<br>
+
+
+
+<label class="font-semibold">
+
+Brand Name
+
+</label>
+
+
+<input
+
+name="brand_name"
+
+class="w-full p-3 border rounded-xl"
+
+placeholder="Business brand name"
+
+required>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- RATING --}}
+
+
+<div class="mb-6 bg-gradient-to-r from-blue-50 to-pink-50 rounded-2xl p-6">
+
+
+<label class="font-semibold text-gray-700">
+
+⭐ Rate Your Experience
+
+</label>
+
+
+
+<select
+
+name="rating"
+
+class="mt-3 w-full rounded-xl border-gray-200 p-4"
+
+required>
+
+
+<option value="">
+
+Select rating
+
+</option>
+
+
+<option value="1">
+⭐ Very Poor
+</option>
+
+
+<option value="2">
+⭐⭐ Poor
+</option>
+
+
+<option value="3">
+⭐⭐⭐ Average
+</option>
+
+
+<option value="4">
+⭐⭐⭐⭐ Good
+</option>
+
+
+<option value="5">
+⭐⭐⭐⭐⭐ Excellent
+</option>
+
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- REVIEW --}}
+
+
+
+<div class="mb-8">
+
+
+<label class="font-semibold text-gray-700">
+
+Your Experience
+
+</label>
+
+
+
+<textarea
+
+name="review"
+
+rows="6"
+
+class="mt-3 w-full rounded-xl border-gray-200 p-4 resize-none focus:ring-2 focus:ring-purple-400"
+
+placeholder="Describe your experience with this seller..."
+
+required></textarea>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<button
+
+type="submit"
+
+class="w-full py-4 rounded-xl
+
+bg-gradient-to-r from-blue-600 to-pink-500
+
+text-white font-bold text-lg
+
+shadow-lg hover:opacity-90 transition">
+
+
+Submit Review ⭐
+
+
+</button>
+
+
+
+
+
+</form>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
+
+</div>
+
 
 
 @endsection
