@@ -10,22 +10,23 @@ use Illuminate\View\View;
 
 class RegulatorController extends Controller
 {
-    public function index(): View
+    public function dashboard(): View
     {
-        $totalSellers = SellerProfile::query()->count('*');
+        $totalSellers = SellerProfile::count('*');
 
-        $verifiedSellers = SellerProfile::query()->where('verification_status', 'verified')->count('*');
+        $verifiedSellers = SellerProfile::where('verification_status', '=','verified', 'and')->count('*');
 
-        $pendingSellers = SellerProfile::query()->where('verification_status', 'pending')->count('*');
+        $pendingSellers = SellerProfile::where('verification_status', '=', 'pending', 'and')->count('*');
 
-        $rejectedSellers = SellerProfile::query()->where('verification_status', 'rejected')->count('*');
+        $rejectedSellers = SellerProfile::where('verification_status', '=', 'rejected', 'and')->count('*');
 
-        return view('regulator.dashboard', compact(
-            'totalSellers',
-            'verifiedSellers',
-            'pendingSellers',
-            'rejectedSellers'
-        ));
+        $totalReviews = Review::count('*');
+
+        $pendingReviews = Review::where('status', '=', 'pending', 'and')->count('*');
+
+        $totalFraudReports = FraudReport::count('*');
+
+        return view('regulator.dashboard', compact('totalSellers', 'verifiedSellers', 'pendingSellers', 'rejectedSellers', 'totalReviews', 'pendingReviews', 'totalFraudReports'));
     }
 
     public function sellers(): View
@@ -104,4 +105,11 @@ class RegulatorController extends Controller
         return back()->with('success', 'Review deleted successfully.');
     }
 
+    public function deleteReport($id)
+    {
+        $report = FraudReport::findOrFail($id);
+        $report->delete();
+
+        return back()->with('success', 'Report deleted successfully.');
+    }
 }

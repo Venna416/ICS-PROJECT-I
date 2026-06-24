@@ -2,57 +2,30 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\SellerProfile;
 use App\Models\Review;
 
-
 class BuyerController extends Controller
 {
+    public function showSeller($id)
+    {
+        $seller = SellerProfile::findOrFail($id);
 
+        $reviews = Review::where('seller_id', '=', $seller->id, 'and')
+            ->where('status', 'active')
 
-public function showSeller($id)
-{
+            ->latest()
 
+            ->get();
 
-$seller = SellerProfile::findOrFail($id);
+        return view(
+            'buyer.seller-details',
 
+            compact(
+                'seller',
 
-
-$reviews = Review::where(
-
-'brand_name',
-
-$seller->brand_name
-
-)
-
-->latest()
-
-->get();
-
-
-
-
-
-return view(
-
-'buyer.seller-details',
-
-compact(
-
-'seller',
-
-'reviews'
-
-)
-
-);
-
-
-
-}
-
-
-
+                'reviews',
+            ),
+        );
+    }
 }
