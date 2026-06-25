@@ -33,6 +33,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/search', [SellerProfileController::class, 'index'])->name('sellers.search');
+
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD REDIRECT
@@ -271,8 +273,7 @@ Route::middleware('auth')->group(function () {
         [SellerProfileController::class, 'destroy'],
     )->name('seller.profile.destroy');
 
-    //landing page - search sellers
-    Route::get('/search',[SellerProfileController::class,'index'])->name('sellers.search');
+    
 
     /*
 |--------------------------------------------------------------------------
@@ -530,7 +531,13 @@ Route::middleware('auth')->group(function () {
 Route::get('/notifications/read/{id}', function ($id) {
 
 
-    $notification = auth()->user()
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $notification = $user
         ->notifications()
         ->where('id',$id)
         ->first();
@@ -550,7 +557,7 @@ Route::get('/notifications/read/{id}', function ($id) {
     return redirect()->back();
 
 
-})->name('notifications.read');
+})->middleware('auth')->name('notifications.read');
 
     /*
 |--------------------------------------------------------------------------
