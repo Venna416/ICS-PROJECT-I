@@ -524,9 +524,40 @@ Route::middleware('auth')->group(function () {
 
     /*
 |--------------------------------------------------------------------------
+| NOTIFICATION READ
+|--------------------------------------------------------------------------
+*/
+Route::get('/notifications/read/{id}', function ($id) {
+
+
+    $notification = auth()->user()
+        ->notifications()
+        ->where('id',$id)
+        ->first();
+
+
+
+    if($notification){
+
+
+        $notification->markAsRead();
+
+
+    }
+
+
+
+    return redirect()->back();
+
+
+})->name('notifications.read');
+
+    /*
+|--------------------------------------------------------------------------
 | PROFILE REDIRECT
 |--------------------------------------------------------------------------
 */
+
 
     Route::get('/profile', function () {
         $user = Auth::user();

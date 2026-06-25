@@ -1,24 +1,38 @@
 @extends('layouts.app')
 
+
 @section('content')
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-10">
+
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 p-10">
 
 
-<div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-10">
+<div class="max-w-7xl mx-auto">
 
 
-<!-- PAGE HEADER -->
 
-<div class="mb-10">
+<!-- HEADER -->
 
-<h1 class="text-4xl font-bold text-gray-800">
+<div class="bg-gradient-to-r from-blue-700 to-purple-700 rounded-3xl p-8 text-white shadow-xl mb-8">
+
+
+<h1 class="text-4xl font-bold">
+
 🔎 Seller Verification Review
+
 </h1>
 
 
+<p class="mt-2 text-blue-100">
+
+Review seller information, documents and verification assessment.
+
+</p>
+
 
 </div>
+
+
 
 
 
@@ -28,12 +42,17 @@
 
 <!-- SELLER PROFILE -->
 
-<div class="bg-gray-50 rounded-2xl p-6 mb-8">
+
+<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
+
 
 
 <h2 class="text-2xl font-bold mb-6">
-👤 Seller Information
+
+👤 Seller Profile
+
 </h2>
+
 
 
 
@@ -42,17 +61,23 @@
 
 @if($seller->profile_photo)
 
-<img 
+
+<img
+
 src="{{asset('storage/'.$seller->profile_photo)}}"
-class="w-32 h-32 rounded-full object-cover shadow">
+
+class="w-28 h-28 rounded-full object-cover shadow">
+
 
 @else
 
-<div class="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center text-5xl">
+
+<div class="w-28 h-28 rounded-full bg-blue-100 flex items-center justify-center text-5xl">
 
 👤
 
 </div>
+
 
 @endif
 
@@ -62,36 +87,43 @@ class="w-32 h-32 rounded-full object-cover shadow">
 
 <div>
 
-<h3 class="text-2xl font-bold">
+
+<h3 class="text-3xl font-bold">
 
 {{$seller->brand_name}}
 
 </h3>
 
 
-<p class="text-gray-600 mt-2">
+
+<p class="text-gray-500 mt-2">
 
 Owner:
+
 {{$seller->user->name}}
 
 </p>
 
 
-<p class="text-gray-600">
 
-Email:
+<p class="text-gray-500">
+
 {{$seller->user->email}}
 
 </p>
 
 
+
+</div>
+
+
+
 </div>
 
 
 </div>
 
 
-</div>
 
 
 
@@ -99,48 +131,28 @@ Email:
 
 
 
+<!-- SCORE DISPLAY -->
 
-
-<!-- BUSINESS DETAILS -->
-
-
-<div class="mb-10">
-
-
-<h2 class="text-2xl font-bold mb-5">
-🏪 Business Information
-</h2>
+<div class="grid md:grid-cols-3 gap-6 mb-8">
 
 
 
-<div class="grid md:grid-cols-2 gap-5">
+<div class="bg-blue-50 rounded-3xl p-6 shadow">
 
 
+<h3 class="font-bold text-blue-700">
 
-<div class="bg-blue-50 rounded-xl p-5">
+⭐ Trust Score
 
-<p class="font-semibold">
-Business Category
+</h3>
+
+
+<p class="text-5xl font-bold mt-3">
+
+{{$seller->trust_score ?? 0}}%
+
 </p>
 
-<p>
-{{$seller->business_category}}
-</p>
-
-</div>
-
-
-
-
-<div class="bg-purple-50 rounded-xl p-5">
-
-<p class="font-semibold">
-Location
-</p>
-
-<p>
-{{$seller->location}}
-</p>
 
 </div>
 
@@ -148,37 +160,24 @@ Location
 
 
 
-<div class="bg-green-50 rounded-xl p-5">
 
-<p class="font-semibold">
-Phone Number
+
+
+<div class="bg-red-50 rounded-3xl p-6 shadow">
+
+
+<h3 class="font-bold text-red-700">
+
+⚠ Risk Score
+
+</h3>
+
+
+<p class="text-5xl font-bold mt-3">
+
+{{$seller->risk_score ?? 0}}/10
+
 </p>
-
-<p>
-{{$seller->phone_number}}
-</p>
-
-</div>
-
-
-
-
-
-<div class="bg-pink-50 rounded-xl p-5">
-
-<p class="font-semibold">
-Social Platform
-</p>
-
-<p>
-{{$seller->social_platform}}
-</p>
-
-</div>
-
-
-
-</div>
 
 
 </div>
@@ -191,83 +190,93 @@ Social Platform
 
 
 
-
-<!-- SHOP VERIFICATION -->
-
-
-<div class="bg-yellow-50 rounded-2xl p-6 mb-10">
+<div class="bg-gray-50 rounded-3xl p-6 shadow">
 
 
-<h2 class="text-2xl font-bold mb-4">
+<h3 class="font-bold text-gray-700">
 
-🌐 Online Presence
+Status
 
-</h2>
+</h3>
 
 
 
-@if($seller->shop_link)
+<p class="text-2xl font-bold mt-5">
 
 
-<a
 
-href="{{$seller->shop_link}}"
 
-target="_blank"
 
-class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700">
+@if($seller->verification_status == "verified")
 
-Visit Seller Shop 🔗
 
-</a>
+<span class="px-5 py-2 rounded-full
+
+bg-green-100 text-green-700">
+
+✓ Verified
+
+</span>
+
+
+
+
+
+
+@elseif($seller->verification_status == "rejected")
+
+
+<span class="px-5 py-2 rounded-full
+
+bg-red-100 text-red-700">
+
+✕ Rejected
+
+</span>
+
+
+
+
+
+
+@elseif($seller->verification_status == "pending")
+
+
+<span class="px-5 py-2 rounded-full
+
+bg-yellow-100 text-yellow-700">
+
+⏳ Pending Review
+
+</span>
+
+
+
 
 
 
 @else
 
 
-<p class="text-gray-500">
+<span class="px-5 py-2 rounded-full
 
-No shop link provided
+bg-gray-100 text-gray-700">
 
-</p>
+Not Assessed
+
+</span>
+
+
+
 
 
 @endif
 
 
 
-</div>
 
 
-
-
-
-
-
-
-
-<!-- DESCRIPTION -->
-
-
-<div class="mb-10">
-
-
-<h2 class="text-2xl font-bold mb-4">
-
-📝 Business Description
-
-</h2>
-
-
-
-<div class="bg-gray-50 rounded-xl p-6">
-
-
-{{$seller->description ?? 'No description provided'}}
-
-
-</div>
+</p>
 
 
 </div>
@@ -276,22 +285,20 @@ No shop link provided
 
 
 
-
-
-
-
-
+</div>
 <!-- DOCUMENTS -->
 
 
-<div class="mb-10">
+<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
 
 
-<h2 class="text-2xl font-bold mb-5">
+
+<h2 class="text-2xl font-bold mb-6">
 
 📂 Verification Documents
 
 </h2>
+
 
 
 
@@ -301,7 +308,9 @@ No shop link provided
 
 
 
+
 @if($seller->id_front)
+
 
 <a
 
@@ -309,14 +318,28 @@ href="{{asset('storage/'.$seller->id_front)}}"
 
 target="_blank"
 
-class="bg-blue-100 rounded-xl p-6 text-center hover:shadow">
+class="bg-blue-100 hover:bg-blue-200 rounded-2xl p-6 text-center transition">
 
+
+<div class="text-4xl">
 
 🪪
 
-<br>
+</div>
+
+
+<p class="font-bold mt-3">
 
 National ID Front
+
+</p>
+
+
+<p class="text-sm text-gray-500">
+
+Click to view
+
+</p>
 
 
 </a>
@@ -329,7 +352,9 @@ National ID Front
 
 
 
+
 @if($seller->id_back)
+
 
 <a
 
@@ -337,14 +362,28 @@ href="{{asset('storage/'.$seller->id_back)}}"
 
 target="_blank"
 
-class="bg-blue-100 rounded-xl p-6 text-center hover:shadow">
+class="bg-blue-100 hover:bg-blue-200 rounded-2xl p-6 text-center transition">
 
+
+<div class="text-4xl">
 
 🪪
 
-<br>
+</div>
+
+
+<p class="font-bold mt-3">
 
 National ID Back
+
+</p>
+
+
+<p class="text-sm text-gray-500">
+
+Click to view
+
+</p>
 
 
 </a>
@@ -367,16 +406,28 @@ href="{{asset('storage/'.$document->file_path)}}"
 
 target="_blank"
 
-class="bg-purple-100 rounded-xl p-6 text-center hover:shadow">
+class="bg-purple-100 hover:bg-purple-200 rounded-2xl p-6 text-center transition">
 
+
+<div class="text-4xl">
 
 📄
 
-<br>
+</div>
 
+
+<p class="font-bold mt-3">
 
 {{$document->document_type}}
 
+</p>
+
+
+<p class="text-sm text-gray-500">
+
+Click to open
+
+</p>
 
 
 </a>
@@ -387,13 +438,12 @@ class="bg-purple-100 rounded-xl p-6 text-center hover:shadow">
 
 
 
-</div>
-
 
 </div>
 
 
 
+</div>
 
 
 
@@ -403,195 +453,31 @@ class="bg-purple-100 rounded-xl p-6 text-center hover:shadow">
 
 
 
-
-<!-- ADMIN DECISION -->
-
-
-<div class="border-t pt-10">
+<!-- GENERATED REASON -->
 
 
-<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8">
+<div class="bg-yellow-50 rounded-3xl p-8 mb-8">
 
 
-<h2 class="text-2xl font-bold mb-6">
+<h2 class="text-2xl font-bold mb-4">
 
-⚖️ Verification Decision
+📌 System Verification Reason
 
 </h2>
 
 
 
+<p class="text-gray-700 leading-relaxed">
 
-<form
 
-action="{{route('admin.verifySeller',$seller->id)}}"
+{{$seller->verification_reason ?? 
 
-method="POST">
+'Verification has not been completed yet.'}}
 
-
-@csrf
-
-
-
-
-
-<div class="grid md:grid-cols-3 gap-5 mb-6">
-
-
-
-<div>
-
-
-<label class="block font-semibold mb-2">
-
-Decision
-
-</label>
-
-
-<select
-
-name="status"
-
-class="w-full border rounded-xl p-3">
-
-
-<option value="verified">
-
-✅ Approve Seller
-
-</option>
-
-
-<option value="rejected">
-
-❌ Reject Seller
-
-</option>
-
-
-</select>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div>
-
-
-<label class="block font-semibold mb-2">
-
-Risk Score (1-10)
-
-</label>
-
-
-<input
-
-type="number"
-
-name="risk_score"
-
-min="1"
-
-max="10"
-
-required
-
-class="w-full border rounded-xl p-3"
-
-placeholder="3">
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label class="block font-semibold mb-2">
-
-Trust Score (0-100)
-
-</label>
-
-
-<input
-
-type="number"
-
-name="trust_score"
-
-min="0"
-
-max="100"
-
-required
-
-class="w-full border rounded-xl p-3"
-
-placeholder="Example: 85">
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- REASON BOX -->
-
-
-<div class="mb-6">
-
-
-<label class="block font-semibold text-gray-700 mb-2">
-
-📌 Verification Reason
-
-</label>
-
-
-<p class="text-sm text-gray-500 mb-3">
-
-Explain why this seller was approved, rejected, or given a high risk score.
 
 </p>
 
 
-
-<textarea
-
-name="verification_reason"
-
-rows="5"
-
-class="w-full border rounded-xl p-4 focus:ring-2 focus:ring-blue-400"
-
-placeholder="Example: Seller provided valid documents and verified business presence..."></textarea>
-
-
 </div>
 
 
@@ -600,28 +486,41 @@ placeholder="Example: Seller provided valid documents and verified business pres
 
 
 
-<button
-
-class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-3 rounded-xl font-semibold hover:opacity-90">
 
 
-Save Verification
+<!-- ACTION -->
 
 
-</button>
+<div class="bg-white rounded-3xl shadow-lg p-8">
 
 
 
-</form>
+<h2 class="text-2xl font-bold mb-5">
+
+⚖️ Continue Verification
+
+</h2>
+
+
+
+<a
+
+href="{{route('admin.editVerification',$seller->id)}}"
+
+class="inline-block px-10 py-4 rounded-xl
+
+bg-gradient-to-r from-blue-600 to-purple-600
+
+text-white font-bold">
+
+
+Open Verification Assessment
+
+</a>
+
 
 
 </div>
-
-
-</div>
-
-
-
 
 
 

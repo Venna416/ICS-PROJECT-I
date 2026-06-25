@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\FraudReport;
 use App\Models\SellerProfile;
-
+use App\Models\User;
+use App\Notifications\AdminActivityNotification;
 
 
 class FraudReportController extends Controller
@@ -156,7 +157,27 @@ class FraudReportController extends Controller
 
         ]);
 
+$admins = User::where('role','admin')->get();
 
+
+
+foreach($admins as $admin)
+
+{
+
+$admin->notify(
+
+new AdminActivityNotification(
+
+"🚨 New Fraud Report",
+
+"A new fraud report has been submitted and requires review."
+
+)
+
+);
+
+}
 
 
 

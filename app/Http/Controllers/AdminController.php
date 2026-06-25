@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\SellerProfile;
 use App\Models\Review;
 use App\Models\FraudReport;
-
+use App\Notifications\SellerVerificationStatus;
 
 
 
@@ -288,114 +288,283 @@ compact('seller')
 
 
 
+public function updateVerification(Request $request, $id)
+{
+
+
+    $seller = SellerProfile::findOrFail($id);
+
+
+
+    $trust = 0;
+
+    $risk = 0;
+
+
+    $reasons = [];
 
 
 
 
 
 
-/*
+    /*
+    |--------------------------------------------------------------------------
+    | TRUST SCORE CALCULATION
+    |--------------------------------------------------------------------------
+    */
+
+
+    if($request->valid_documents)
+
+    {
+
+        $trust += 20;
+
+    }
+
+    else
+
+    {
+
+        $reasons[] = "No valid documents were provided.";
+
+    }
+
+
+
+
+
+    if($request->complete_profile)
+
+    {
+
+        $trust += 10;
+
+    }
+
+    else
+
+    {
+
+        $reasons[] = "Seller profile information is incomplete.";
+
+    }
+
+
+
+
+
+
+    if($request->business_license)
+
+    {
+
+        $trust += 20;
+
+    }
+
+    else
+
+    {
+
+        $reasons[] = "Business license has not been verified.";
+
+    }
+
+
+
+
+
+
+
+    if($request->good_reviews)
+
+    {
+
+        $trust += 20;
+
+    }
+
+
+    elseif($request->limited_reviews)
+
+    {
+
+        $trust += 10;
+
+
+        $reasons[] =
+        "Seller has less than 3 reviews or average rating is below 4 stars.";
+
+    }
+
+
+    else
+
+    {
+
+        $reasons[] =
+        "Seller does not have enough positive buyer reviews.";
+
+    }
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RISK SCORE CALCULATION
+    |--------------------------------------------------------------------------
+    */
+
+
+    if($request->missing_documents)
+
+    {
+
+        $risk += 3;
+
+
+        $reasons[] =
+        "Risk increased because documents are missing.";
+
+    }
+
+
+
+
+
+
+
+    if($request->fraud_reports)
+
+    {
+
+        $risk += 4;
+
+
+        $reasons[] =
+        "Risk increased because fraud reports were received.";
+
+    }
+
+
+
+
+
+
+
+    if($request->poor_reviews)
+
+    {
+
+        $risk += 2;
+
+
+        $reasons[] =
+        "Risk increased because customer reviews are poor.";
+
+    }
+
+
+
+
+
+
+
+    if($request->incomplete_information)
+
+    {
+
+        $risk += 2;
+
+
+        $reasons[] =
+        "Risk increased because business information is incomplete.";
+
+    }
+
+
+
+
+
+
+    // Maximum risk score is 10
+
+    if($risk > 10)
+
+    {
+
+        $risk = 10;
+
+    }
+
+
+
+
+
+
+
+
+
+   /*
 |--------------------------------------------------------------------------
-| UPDATE VERIFICATION
+| AUTOMATIC STATUS DECISION
 |--------------------------------------------------------------------------
 */
 
 
-public function updateVerification(Request $request,$id)
+if($risk >= 6 || $trust < 40)
+
 {
 
+    $status = "rejected";
 
-$seller = SellerProfile::findOrFail($id);
-
-
-
-
-$request->validate([
+    $verified = false;
 
 
-'status'=>'required|in:verified,rejected',
-
-
-'risk_score'=>'required|integer|min:1|max:10',
-
-
-'trust_score'=>'required|integer|min:0|max:100',
-
-
-'verification_reason'=>'nullable|string|max:1000'
-
-
-]);
-
-
-
-
-
-
-
-$seller->update([
-
-
-
-'verification_status'=>$request->status,
-
-
-'verified'=>$request->status === 'verified',
-
-
-'risk_score'=>$request->risk_score,
-
-
-'trust_score'=>$request->trust_score,
-
-
-'verification_reason'=>$request->verification_reason
-
-
-
-]);
-
-
-
-
-
-
-
-if($request->status === 'rejected'){
-
-
-return redirect()
-
-->route('admin.rejected')
-
-->with(
-
-'success',
-
-'Rejection updated successfully'
-
-);
-
+    $reasons[] =
+    "Seller rejected because risk is high or trust score is too low.";
 
 }
 
 
 
 
+elseif($trust >= 70 && $risk <= 4)
 
-return redirect()
+{
 
-->route('admin.verified')
+    $status = "verified";
 
-->with(
-
-'success',
-
-'Seller verified successfully'
-
-);
+    $verified = true;
 
 
+    $reasons[] =
+    "Seller passed verification requirements.";
+
+}
+
+
+
+
+else
+
+{
+
+    $status = "pending";
+
+    $verified = false;
+
+
+    $reasons[] =
+    "Seller requires more verification.";
 
 }
 
@@ -404,6 +573,105 @@ return redirect()
 
 
 
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE TO DATABASE
+    |--------------------------------------------------------------------------
+    */
+
+
+    $seller->update([
+
+
+    'trust_score' => $trust,
+
+    'risk_score' => $risk,
+
+
+    'verification_status' => $status,
+
+    'verified' => $verified,
+
+
+    'valid_documents' => 
+    $request->valid_documents ?? false,
+
+
+    'complete_profile' => 
+    $request->complete_profile ?? false,
+
+
+    'business_license' => 
+    $request->business_license ?? false,
+
+
+    'good_reviews' => 
+    $request->good_reviews ?? false,
+
+
+    'limited_reviews' => 
+    $request->limited_reviews ?? false,
+
+
+    'missing_documents' => 
+    $request->missing_documents ?? false,
+
+
+    'fraud_reports' => 
+    $request->fraud_reports ?? false,
+
+
+    'poor_reviews' => 
+    $request->poor_reviews ?? false,
+
+
+    'incomplete_information' => 
+    $request->incomplete_information ?? false,
+
+
+    'verification_reason' => 
+    implode(" ", $reasons),
+
+
+]);
+
+
+
+
+
+// SEND SELLER NOTIFICATION
+
+$seller->user->notify(
+
+    new SellerVerificationStatus($seller)
+
+);
+
+
+
+
+
+return redirect()
+
+->route(
+
+    'admin.seller.show',
+
+    $seller->id
+
+)
+
+->with(
+
+    'success',
+
+    'Seller verification calculated successfully.'
+
+);
+}
 
 
 

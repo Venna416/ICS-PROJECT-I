@@ -8,26 +8,48 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SellerProfile extends Model
 {
-    protected $fillable = [
-    'user_id',
-    'brand_name',
-    'business_category',
-    'location',
-    'phone_number',
-    'social_platform',
-    'shop_link',
-    'description',
-    'profile_photo',
-    'id_front',
-    'id_back',
+    protected $fillable=[
 
-    // verification fields
-    'verification_status',
-    'verified',
-    'risk_score',
-    'trust_score',
-    'verification_reason',
+'user_id',
+
+'brand_name',
+
+'business_category',
+
+'location',
+
+'phone_number',
+
+'valid_documents',
+
+'complete_profile',
+
+'business_license',
+
+'good_reviews',
+
+'no_fraud_reports',
+
+'trust_score',
+
+'risk_score',
+
+'verification_status',
+
+'verified',
+
+'verification_reason',
+
+'missing_documents',
+
+'fraud_reports',
+
+'poor_reviews',
+
+'incomplete_information',
+
 ];
+
 
     public function user(): BelongsTo
     {

@@ -1,26 +1,243 @@
 @extends('layouts.app')
 
+
 @section('content')
 
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-pink-50 p-8">
+<div class="min-h-screen 
+bg-gradient-to-br from-slate-100 via-indigo-50 to-purple-100 
+p-8">
 
 
 <div class="max-w-7xl mx-auto">
 
 
 
-<h1 class="text-4xl font-bold text-gray-800 mb-10">
+<!-- HEADER -->
 
-Admin Dashboard
+
+<div class="bg-gradient-to-r 
+from-indigo-700 
+via-purple-700 
+to-blue-700
+
+rounded-3xl
+
+shadow-2xl
+
+p-10
+
+text-white
+
+mb-10">
+
+
+
+<div class="flex justify-between items-center">
+
+
+
+<div>
+
+
+<h1 class="text-4xl font-bold">
+
+🛡️ Admin Control Center
 
 </h1>
 
 
+<p class="mt-3 text-indigo-100">
+
+Manage seller verification, reviews and fraud monitoring.
+
+</p>
+
+
+</div>
 
 
 
-<div class="grid md:grid-cols-3 gap-6">
+
+
+
+
+
+<!-- BELL -->
+
+
+<div class="relative">
+
+
+<button
+
+onclick="toggleAdminNotifications()"
+
+class="relative
+
+bg-white/20
+
+backdrop-blur
+
+p-4
+
+rounded-full
+
+text-3xl
+
+hover:bg-white/30
+
+transition">
+
+
+🔔
+
+
+
+@if(auth()->user()->unreadNotifications->count() > 0)
+
+
+<span class="absolute
+
+-top-1
+
+-right-1
+
+bg-red-600
+
+text-white
+
+font-bold
+
+text-xs
+
+w-6
+
+h-6
+
+rounded-full
+
+flex items-center justify-center">
+
+
+{{auth()->user()->unreadNotifications->count()}}
+
+
+</span>
+
+
+@endif
+
+
+</button>
+
+
+
+
+
+
+
+<div id="adminNotifications"
+
+class="hidden
+
+absolute
+
+right-0
+
+mt-4
+
+w-96
+
+bg-white
+
+rounded-3xl
+
+shadow-2xl
+
+p-5
+
+text-gray-800
+
+z-50">
+
+
+
+<h2 class="font-bold text-xl mb-4">
+
+🔔 Notifications
+
+</h2>
+
+
+
+@forelse(auth()->user()->unreadNotifications as $notification)
+
+
+<a href="{{route('notifications.read',$notification->id)}}"
+
+class="block bg-indigo-50 rounded-2xl p-4 mb-3">
+
+
+<p class="font-bold">
+
+{{$notification->data['title']}}
+
+</p>
+
+
+<p class="text-sm text-gray-600 mt-1">
+
+{{$notification->data['message']}}
+
+</p>
+
+
+</a>
+
+
+@empty
+
+
+<p class="text-gray-500">
+
+No new notifications
+
+</p>
+
+
+@endforelse
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- CARDS -->
+
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+
 
 
 
@@ -28,33 +245,59 @@ Admin Dashboard
 
 <!-- PENDING -->
 
+
 <a href="{{route('admin.pending')}}"
 
-class="bg-white rounded-2xl shadow-lg p-8 hover:scale-105 transition">
+class="group bg-white rounded-3xl shadow-xl p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-<h2 class="text-xl font-bold text-gray-700">
 
-Pending Sellers
-
-</h2>
+<div class="flex justify-between items-center">
 
 
-<p class="text-5xl font-bold text-yellow-500 mt-4">
+<div>
 
-{{$pendingCount}}
+
+<p class="text-gray-500">
+
+Pending Verification
 
 </p>
 
 
-<p class="mt-3 text-gray-500">
+<h2 class="text-5xl font-bold text-yellow-500 mt-4">
 
-Review applications →
+{{$pendingCount}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+⏳
+
+</div>
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-500">
+
+Review seller applications
 
 </p>
 
 
 </a>
+
 
 
 
@@ -68,31 +311,56 @@ Review applications →
 
 <a href="{{route('admin.verified')}}"
 
-class="bg-white rounded-2xl shadow-lg p-8 hover:scale-105 transition">
+class="group bg-white rounded-3xl shadow-xl p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-<h2 class="text-xl font-bold text-gray-700">
+
+<div class="flex justify-between items-center">
+
+
+<div>
+
+
+<p class="text-gray-500">
 
 Verified Sellers
-
-</h2>
-
-
-<p class="text-5xl font-bold text-green-500 mt-4">
-
-{{$verifiedCount}}
 
 </p>
 
 
-<p class="mt-3 text-gray-500">
+<h2 class="text-5xl font-bold text-green-600 mt-4">
 
-View approved sellers →
+{{$verifiedCount}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+✅
+
+</div>
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-500">
+
+View trusted sellers
 
 </p>
 
 
 </a>
+
 
 
 
@@ -106,31 +374,57 @@ View approved sellers →
 
 <a href="{{route('admin.rejected')}}"
 
-class="bg-white rounded-2xl shadow-lg p-8 hover:scale-105 transition">
+class="group bg-white rounded-3xl shadow-xl p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-<h2 class="text-xl font-bold text-gray-700">
+
+<div class="flex justify-between items-center">
+
+
+<div>
+
+
+<p class="text-gray-500">
 
 Rejected Sellers
-
-</h2>
-
-
-<p class="text-5xl font-bold text-red-500 mt-4">
-
-{{$rejectedCount}}
 
 </p>
 
 
-<p class="mt-3 text-gray-500">
+<h2 class="text-5xl font-bold text-red-600 mt-4">
 
-View rejected sellers →
+{{$rejectedCount}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+❌
+
+</div>
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-500">
+
+View rejected applications
 
 </p>
 
 
 </a>
+
+
 
 
 
@@ -143,26 +437,50 @@ View rejected sellers →
 
 <a href="{{route('admin.reviews')}}"
 
-class="bg-white rounded-2xl shadow-lg p-8 hover:scale-105 transition">
+class="group bg-white rounded-3xl shadow-xl p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-<h2 class="text-xl font-bold text-gray-700">
 
-⭐ Buyer Reviews
-
-</h2>
+<div class="flex justify-between items-center">
 
 
-<p class="text-5xl font-bold text-purple-600 mt-4">
+<div>
 
-{{$reviewCount}}
+
+<p class="text-gray-500">
+
+Buyer Reviews
 
 </p>
 
 
-<p class="text-gray-500 mt-3">
+<h2 class="text-5xl font-bold text-purple-600 mt-4">
 
-View buyer reviews →
+{{$reviewCount}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+⭐
+
+</div>
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-500">
+
+Monitor customer feedback
 
 </p>
 
@@ -175,31 +493,57 @@ View buyer reviews →
 
 
 
-<!-- FRAUD REPORTS -->
+
+
+<!-- FRAUD -->
 
 
 <a href="{{route('admin.fraudReports')}}"
 
-class="bg-white rounded-2xl shadow-lg p-8 hover:scale-105 transition">
+class="group bg-white rounded-3xl shadow-xl p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-<h2 class="text-xl font-bold text-gray-700">
 
-🚨 Fraud Reports
-
-</h2>
+<div class="flex justify-between items-center">
 
 
-<p class="text-5xl font-bold text-red-600 mt-4">
+<div>
 
-{{$fraudCount}}
+
+<p class="text-gray-500">
+
+Fraud Reports
 
 </p>
 
 
-<p class="text-gray-500 mt-3">
+<h2 class="text-5xl font-bold text-red-600 mt-4">
 
-View reports →
+{{$fraudCount}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+🚨
+
+</div>
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-500">
+
+Investigate reports
 
 </p>
 
@@ -211,16 +555,41 @@ View reports →
 
 
 
+
+</div>
+
+
+
+
+</div>
+
+
 </div>
 
 
 
 
 
-</div>
+<script>
 
 
-</div>
+function toggleAdminNotifications(){
+
+
+document
+
+.getElementById('adminNotifications')
+
+.classList
+
+.toggle('hidden');
+
+
+}
+
+
+</script>
+
 
 
 @endsection

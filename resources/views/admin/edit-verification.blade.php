@@ -4,38 +4,31 @@
 @section('content')
 
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12">
+<div class="min-h-screen 
+bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 
+p-10">
 
 
-<div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-10">
-
-
-
-@if(session('success'))
-
-<div class="mb-6 bg-purple-100 text-purple-700 px-6 py-4 rounded-xl">
-
-{{session('success')}}
-
-</div>
-
-@endif
+<div class="max-w-6xl mx-auto">
 
 
 
+<!-- HEADER -->
 
-<div class="mb-8">
+<div class="bg-gradient-to-r from-blue-700 to-purple-700 
+rounded-3xl shadow-xl p-8 text-white mb-8">
 
-<h1 class="text-4xl font-bold text-gray-800">
 
-✏️ Edit Verification Decision
+<h1 class="text-4xl font-bold">
+
+🔐 Seller Verification Assessment
 
 </h1>
 
 
-<p class="text-gray-500 mt-2">
+<p class="mt-3 text-blue-100">
 
-Update seller verification information, scores and decision reason.
+Edit verification factors. Existing assessment choices are already selected.
 
 </p>
 
@@ -48,58 +41,86 @@ Update seller verification information, scores and decision reason.
 
 
 
-<!-- Seller Info -->
 
-<div class="bg-gray-50 rounded-2xl p-6 mb-8">
+
+<!-- SELLER -->
+
+<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
+
+
+<h2 class="text-2xl font-bold mb-5">
+
+👤 Seller
+
+</h2>
+
 
 
 <div class="flex items-center gap-5">
 
 
-@if($seller->profile_photo)
+<div class="w-20 h-20 rounded-full bg-blue-100 
+flex items-center justify-center text-4xl">
 
-<img
-
-src="{{asset('storage/'.$seller->profile_photo)}}"
-
-class="w-24 h-24 rounded-full object-cover shadow">
-
-
-@else
-
-
-<div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center text-4xl">
-
-👤
+🏪
 
 </div>
-
-
-@endif
-
 
 
 
 <div>
 
-<h2 class="text-2xl font-bold">
+
+<h3 class="text-2xl font-bold">
 
 {{$seller->brand_name}}
 
-</h2>
+</h3>
 
 
-<p class="text-gray-600">
+<p class="text-gray-500">
 
-Owner:
 {{$seller->user->name}}
 
 </p>
 
 
-<p class="text-gray-500">
+</div>
 
-{{$seller->user->email}}
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- SCORE -->
+
+
+<div class="grid md:grid-cols-3 gap-6 mb-8">
+
+
+
+<div class="bg-blue-50 rounded-3xl p-6">
+
+<h3 class="font-bold text-blue-700">
+
+⭐ Trust Score
+
+</h3>
+
+
+<p class="text-4xl font-bold mt-3">
+
+{{$seller->trust_score ?? 0}}%
 
 </p>
 
@@ -107,7 +128,24 @@ Owner:
 </div>
 
 
-</div>
+
+
+
+
+<div class="bg-red-50 rounded-3xl p-6">
+
+<h3 class="font-bold text-red-700">
+
+⚠ Risk Score
+
+</h3>
+
+
+<p class="text-4xl font-bold mt-3">
+
+{{$seller->risk_score ?? 0}}/10
+
+</p>
 
 
 </div>
@@ -117,12 +155,42 @@ Owner:
 
 
 
+<div class="bg-green-50 rounded-3xl p-6">
+
+<h3 class="font-bold text-green-700">
+
+Status
+
+</h3>
+
+
+<p class="text-2xl font-bold mt-3">
+
+
+{{$seller->verification_status}}
+
+
+</p>
+
+
+</div>
 
 
 
-<form action="{{route('admin.updateVerification',$seller->id)}}"
 
-method="POST">
+</div>
+
+
+
+
+
+
+
+
+
+<form method="POST"
+
+action="{{route('admin.updateVerification',$seller->id)}}">
 
 
 @csrf
@@ -133,48 +201,10 @@ method="POST">
 
 
 
-<!-- Status -->
-
-<div class="mb-6">
-
-
-<label class="font-semibold text-gray-700">
-
-Verification Decision
-
-</label>
-
-
-<select
-
-name="status"
-
-class="w-full mt-2 border rounded-xl p-3">
-
-
-<option value="verified"
-
-{{$seller->verification_status=='verified'?'selected':''}}>
-
-✓ Approve Seller
-
-</option>
 
 
 
-<option value="rejected"
-
-{{$seller->verification_status=='rejected'?'selected':''}}>
-
-✕ Reject Seller
-
-</option>
-
-
-</select>
-
-
-</div>
+<div class="grid md:grid-cols-2 gap-8">
 
 
 
@@ -182,122 +212,363 @@ class="w-full mt-2 border rounded-xl p-3">
 
 
 
+<!-- TRUST -->
 
-<!-- Scores -->
-
-
-<div class="grid md:grid-cols-2 gap-6 mb-6">
+<div class="bg-blue-50 rounded-3xl p-8">
 
 
+<h2 class="text-2xl font-bold text-blue-700 mb-6">
 
-<div>
+⭐ Trust Factors
+
+</h2>
 
 
-<label class="font-semibold">
 
-Risk Score (1-10)
 
-</label>
+
+
+
+<label class="flex items-center gap-3 mb-5">
 
 
 <input
 
-type="number"
+type="checkbox"
 
-min="1"
+name="valid_documents"
 
-max="10"
+value="1"
 
-name="risk_score"
-
-value="{{$seller->risk_score}}"
-
-class="w-full mt-2 border rounded-xl p-3">
+class="w-5 h-5"
 
 
-</div>
+{{ $seller->valid_documents ? 'checked' : '' }}
+
+>
 
 
+Valid documents (+20)
 
-
-
-
-
-<div>
-
-
-<label class="font-semibold">
-
-Trust Score (0-100)
 
 </label>
+
+
+
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
 
 
 <input
 
-type="number"
+type="checkbox"
 
-min="0"
+name="complete_profile"
 
-max="100"
+value="1"
 
-name="trust_score"
-
-value="{{$seller->trust_score}}"
-
-class="w-full mt-2 border rounded-xl p-3">
+class="w-5 h-5"
 
 
-</div>
+{{ $seller->complete_profile ? 'checked' : '' }}
+
+>
 
 
+Complete seller profile (+10)
 
-</div>
-
-
-
-
-
-
-
-
-
-
-<!-- Reason -->
-
-
-<div class="mb-8">
-
-
-<label class="font-semibold text-gray-700">
-
-Verification Note
 
 </label>
 
 
 
-<p class="text-sm text-gray-500 mb-2">
 
-Explain why the seller was approved, rejected, or why risk is high.
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
+
+
+<input
+
+type="checkbox"
+
+name="business_license"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->business_license ? 'checked' : '' }}
+
+>
+
+
+Business license verified (+20)
+
+
+</label>
+
+
+
+
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
+
+
+<input
+
+type="checkbox"
+
+name="good_reviews"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->good_reviews ? 'checked' : '' }}
+
+>
+
+
+3+ reviews with average 4+ stars (+20)
+
+
+</label>
+
+
+
+
+
+
+
+
+<label class="flex items-center gap-3">
+
+
+<input
+
+type="checkbox"
+
+name="limited_reviews"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->limited_reviews ? 'checked' : '' }}
+
+>
+
+
+Limited reviews / below 4 stars (+10)
+
+
+</label>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- RISK -->
+
+<div class="bg-red-50 rounded-3xl p-8">
+
+
+<h2 class="text-2xl font-bold text-red-700 mb-6">
+
+⚠ Risk Factors
+
+</h2>
+
+
+
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
+
+
+<input
+
+type="checkbox"
+
+name="missing_documents"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->missing_documents ? 'checked' : '' }}
+
+>
+
+
+Missing documents (+3)
+
+
+</label>
+
+
+
+
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
+
+
+<input
+
+type="checkbox"
+
+name="fraud_reports"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->fraud_reports ? 'checked' : '' }}
+
+>
+
+
+Fraud reports received (+4)
+
+
+</label>
+
+
+
+
+
+
+
+
+<label class="flex items-center gap-3 mb-5">
+
+
+<input
+
+type="checkbox"
+
+name="poor_reviews"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->poor_reviews ? 'checked' : '' }}
+
+>
+
+
+Poor customer reviews (+2)
+
+
+</label>
+
+
+
+
+
+
+
+
+<label class="flex items-center gap-3">
+
+
+<input
+
+type="checkbox"
+
+name="incomplete_information"
+
+value="1"
+
+class="w-5 h-5"
+
+
+{{ $seller->incomplete_information ? 'checked' : '' }}
+
+>
+
+
+Incomplete business information (+2)
+
+
+</label>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- REASON -->
+
+<div class="mt-8 bg-yellow-50 rounded-3xl p-6">
+
+
+<h2 class="font-bold text-xl">
+
+📌 Current System Reason
+
+</h2>
+
+
+<p class="mt-3 text-gray-700">
+
+
+{{$seller->verification_reason ?? 'No verification completed yet.'}}
+
 
 </p>
 
 
-
-<textarea
-
-name="verification_reason"
-
-rows="5"
-
-class="w-full border rounded-xl p-4"
-
-placeholder="Example: Seller provided valid documents but business details require further review.">{{old('verification_reason',$seller->verification_reason)}}</textarea>
-
-
-
 </div>
+
 
 
 
@@ -308,13 +579,21 @@ placeholder="Example: Seller provided valid documents but business details requi
 
 <button
 
-class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:opacity-90">
+type="submit"
+
+class="mt-10 w-full py-4 rounded-2xl
+
+bg-gradient-to-r from-blue-600 to-purple-600
+
+text-white font-bold text-lg shadow-lg">
 
 
-💾 Update Verification
+Update Verification
 
 
 </button>
+
+
 
 
 
@@ -324,11 +603,12 @@ class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 round
 
 
 
-</div>
 
 
 </div>
 
+
+</div>
 
 
 @endsection

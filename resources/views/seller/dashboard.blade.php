@@ -4,7 +4,9 @@
 @section('content')
 
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-10">
+<div class="min-h-screen 
+bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 
+p-8">
 
 
 <div class="max-w-7xl mx-auto">
@@ -15,20 +17,27 @@
 
 <!-- HEADER -->
 
+<div class="bg-gradient-to-r from-blue-700 via-purple-700 to-indigo-700
 
-<div class="mb-10">
+rounded-3xl shadow-xl p-10 text-white mb-8">
 
 
-<h1 class="text-4xl font-bold text-gray-800">
+<div class="flex justify-between items-center">
 
-Seller Dashboard
+
+
+<div>
+
+<h1 class="text-4xl font-bold">
+
+🏪 Seller Dashboard
 
 </h1>
 
 
-<p class="text-gray-500 mt-2">
+<p class="mt-3 text-blue-100">
 
-Monitor verification status, trust score and customer activity.
+Manage your verification, reputation and business activity.
 
 </p>
 
@@ -41,12 +50,173 @@ Monitor verification status, trust score and customer activity.
 
 
 
+<!-- NOTIFICATION -->
+
+<div class="relative">
 
 
-<!-- VERIFICATION CARDS -->
+<button
+
+onclick="toggleNotifications()"
+
+class="relative bg-white/20 backdrop-blur
+
+p-4 rounded-full
+
+text-3xl
+
+hover:bg-white/30">
 
 
-<div class="grid md:grid-cols-3 gap-6">
+🔔
+
+
+
+@if(auth()->user()->unreadNotifications->count() > 0)
+
+
+<span class="absolute -top-2 -right-2
+
+bg-red-600
+
+text-white
+
+font-bold
+
+text-xs
+
+w-6 h-6
+
+rounded-full
+
+flex items-center justify-center">
+
+
+{{auth()->user()->unreadNotifications->count()}}
+
+
+</span>
+
+
+@endif
+
+
+</button>
+
+
+
+
+
+
+
+<div id="notificationBox"
+
+class="hidden absolute right-0 mt-4
+
+w-96
+
+bg-white
+
+rounded-3xl
+
+shadow-2xl
+
+p-5
+
+text-gray-800
+
+z-50">
+
+
+
+<h2 class="font-bold text-xl mb-4">
+
+🔔 Notifications
+
+</h2>
+
+
+
+
+
+@forelse(auth()->user()->unreadNotifications as $notification)
+
+
+<a href="{{route('notifications.read',$notification->id)}}"
+
+class="block bg-blue-50
+
+rounded-2xl
+
+p-4
+
+mb-3
+
+hover:bg-blue-100">
+
+
+
+<h3 class="font-bold">
+
+{{$notification->data['title']}}
+
+</h3>
+
+
+<p class="text-sm text-gray-600 mt-2">
+
+{{$notification->data['message']}}
+
+</p>
+
+
+
+</a>
+
+
+
+@empty
+
+
+<p class="text-gray-500">
+
+No new notifications
+
+</p>
+
+
+
+@endforelse
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- SCORE CARDS -->
+
+
+<div class="grid md:grid-cols-3 gap-6 mb-8">
 
 
 
@@ -54,8 +224,7 @@ Monitor verification status, trust score and customer activity.
 
 <!-- STATUS -->
 
-
-<div class="bg-white rounded-3xl shadow-lg p-6">
+<div class="bg-white rounded-3xl shadow-lg p-7">
 
 
 <p class="text-gray-500">
@@ -69,7 +238,7 @@ Verification Status
 @if($sellerProfile->verification_status == 'verified')
 
 
-<h2 class="text-2xl font-bold text-blue-600 mt-3">
+<h2 class="text-3xl font-bold text-green-600 mt-4">
 
 ✓ Verified
 
@@ -80,7 +249,7 @@ Verification Status
 @elseif($sellerProfile->verification_status == 'rejected')
 
 
-<h2 class="text-2xl font-bold text-red-600 mt-3">
+<h2 class="text-3xl font-bold text-red-600 mt-4">
 
 ✕ Rejected
 
@@ -91,15 +260,15 @@ Verification Status
 @else
 
 
-<h2 class="text-2xl font-bold text-purple-600 mt-3">
+<h2 class="text-3xl font-bold text-yellow-600 mt-4">
 
 ⏳ Pending
 
 </h2>
 
 
-@endif
 
+@endif
 
 
 </div>
@@ -114,41 +283,94 @@ Verification Status
 
 <!-- TRUST -->
 
-
-<div class="bg-white rounded-3xl shadow-lg p-6">
+<div class="bg-white rounded-3xl shadow-lg p-7">
 
 
 <p class="text-gray-500">
 
-Trust Score
+⭐ Trust Score
 
 </p>
 
 
+<h2 class="text-5xl font-bold text-purple-600 mt-4">
 
-@if($trustScore !== null)
-
-
-<h2 class="text-4xl font-bold text-purple-600 mt-3">
-
-{{$trustScore}}%
+{{$trustScore ?? 0}}%
 
 </h2>
+
+
+
+@if(($trustScore ?? 0) >= 70)
+
+
+<span class="inline-block mt-3
+
+px-4 py-2
+
+rounded-full
+
+bg-green-100
+
+text-green-700
+
+font-bold">
+
+
+High Trust
+
+
+</span>
+
+
+
+@elseif(($trustScore ?? 0) >=40)
+
+
+<span class="inline-block mt-3
+
+px-4 py-2
+
+rounded-full
+
+bg-yellow-100
+
+text-yellow-700
+
+font-bold">
+
+
+Medium Trust
+
+
+</span>
 
 
 
 @else
 
 
-<h2 class="text-3xl font-bold text-gray-400 mt-3">
+<span class="inline-block mt-3
 
-Pending
+px-4 py-2
 
-</h2>
+rounded-full
+
+bg-red-100
+
+text-red-700
+
+font-bold">
+
+
+Low Trust
+
+
+</span>
+
 
 
 @endif
-
 
 
 </div>
@@ -163,43 +385,96 @@ Pending
 
 <!-- RISK -->
 
-
-<div class="bg-white rounded-3xl shadow-lg p-6">
+<div class="bg-white rounded-3xl shadow-lg p-7">
 
 
 <p class="text-gray-500">
 
-Risk Level
+⚠ Risk Score
 
 </p>
 
 
+<h2 class="text-5xl font-bold text-red-600 mt-4">
 
-@if($riskScore !== null)
 
+{{$riskScore ?? 0}}/10
 
-<h2 class="text-3xl font-bold mt-3">
-
-{{$riskLevel}}
 
 </h2>
 
 
-<p class="text-gray-500">
 
-{{$riskScore}} / 10
 
-</p>
+
+@if(($riskScore ?? 0) <= 3)
+
+
+<span class="inline-block mt-3
+
+px-4 py-2
+
+rounded-full
+
+bg-green-100
+
+text-green-700
+
+font-bold">
+
+
+🟢 Low Risk
+
+
+</span>
+
+
+
+@elseif(($riskScore ?? 0) <=6)
+
+
+<span class="inline-block mt-3
+
+px-4 py-2
+
+rounded-full
+
+bg-yellow-100
+
+text-yellow-700
+
+font-bold">
+
+
+🟡 Medium Risk
+
+
+</span>
+
+
 
 
 @else
 
 
-<h2 class="text-3xl font-bold text-gray-400 mt-3">
+<span class="inline-block mt-3
 
-Pending
+px-4 py-2
 
-</h2>
+rounded-full
+
+bg-red-100
+
+text-red-700
+
+font-bold">
+
+
+🔴 High Risk
+
+
+</span>
+
 
 
 @endif
@@ -211,6 +486,9 @@ Pending
 
 
 
+
+
+
 </div>
 
 
@@ -221,16 +499,13 @@ Pending
 
 
 
+<!-- FEEDBACK -->
 
 
-
-<!-- VERIFICATION FEEDBACK -->
-
-
-<div class="mt-8 bg-white rounded-3xl shadow-lg p-8">
+<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
 
 
-<h2 class="text-2xl font-bold mb-4">
+<h2 class="text-2xl font-bold mb-5">
 
 📌 Verification Feedback
 
@@ -238,36 +513,21 @@ Pending
 
 
 
-
-@if($sellerProfile->verification_reason)
-
-
-<div class="bg-purple-50 rounded-xl p-5">
+<div class="bg-purple-50 rounded-2xl p-6">
 
 
 <p class="text-gray-700">
 
-{{$sellerProfile->verification_reason}}
+
+{{$sellerProfile->verification_reason 
+?? 
+'Waiting for admin verification.'}}
+
 
 </p>
 
 
 </div>
-
-
-
-@else
-
-
-<p class="text-gray-400">
-
-Waiting for admin review.
-
-</p>
-
-
-@endif
-
 
 
 </div>
@@ -280,22 +540,18 @@ Waiting for admin review.
 
 
 
+<!-- ACTIVITY -->
+
+
+<div class="grid md:grid-cols-2 gap-8 mb-8">
 
 
 
 
-<!-- BUYER ACTIVITY -->
-
-<div class="mt-10 grid md:grid-cols-2 gap-8">
-
-
-
-<!-- REVIEWS -->
 
 <a href="{{route('seller.reviews')}}"
 
-class="bg-white rounded-3xl shadow-lg p-8 
-hover:shadow-xl transition cursor-pointer">
+class="bg-white rounded-3xl shadow-lg p-8 hover:shadow-2xl">
 
 
 <h2 class="text-2xl font-bold">
@@ -305,31 +561,18 @@ hover:shadow-xl transition cursor-pointer">
 </h2>
 
 
-
-
-<p class="text-5xl font-bold text-purple-600 mt-5">
+<p class="text-6xl font-bold text-purple-600 mt-5">
 
 {{$reviewCount}}
 
 </p>
 
 
+<p class="text-gray-500 mt-3">
 
-
-<p class="text-gray-500 mt-2">
-
-Total reviews received from buyers.
+Customer feedback received.
 
 </p>
-
-
-
-<p class="mt-5 text-purple-600 font-semibold">
-
-View customer feedback →
-
-</p>
-
 
 
 </a>
@@ -338,9 +581,6 @@ View customer feedback →
 
 
 
-
-
-<!-- REPORTS -->
 
 
 <div class="bg-white rounded-3xl shadow-lg p-8">
@@ -353,42 +593,27 @@ View customer feedback →
 </h2>
 
 
-
-
-<p class="text-5xl font-bold text-red-600 mt-5">
+<p class="text-6xl font-bold text-red-600 mt-5">
 
 {{$fraudCount}}
 
 </p>
 
 
+<p class="text-gray-500 mt-3">
 
-
-<p class="text-gray-500 mt-2">
-
-Reports submitted about your business.
+Reports associated with your business.
 
 </p>
-
-
-
-
-<p class="text-sm text-gray-400 mt-4">
-
-Report details are confidential and reviewed by the verification team.
-
-</p>
-
 
 
 </div>
 
 
 
+
+
 </div>
-
-
-
 
 
 
@@ -401,20 +626,19 @@ Report details are confidential and reviewed by the verification team.
 <!-- PROFILE -->
 
 
-<div class="mt-10 bg-white rounded-3xl shadow-lg p-8">
+<div class="bg-white rounded-3xl shadow-lg p-8">
 
 
 <h2 class="text-2xl font-bold">
 
-👤 Seller Profile
+👤 Business Profile
 
 </h2>
 
 
-
 <p class="text-gray-500 mt-2">
 
-Manage business details, documents and profile information.
+Manage your business details and documents.
 
 </p>
 
@@ -423,7 +647,22 @@ Manage business details, documents and profile information.
 
 <a href="{{route('seller.profile.show',$sellerProfile->id)}}"
 
-class="inline-block mt-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl">
+
+class="inline-block mt-6
+
+bg-gradient-to-r
+
+from-blue-600
+
+to-purple-600
+
+text-white
+
+px-8 py-3
+
+rounded-xl
+
+font-bold">
 
 
 View Profile
@@ -432,7 +671,6 @@ View Profile
 </a>
 
 
-
 </div>
 
 
@@ -445,6 +683,28 @@ View Profile
 
 
 </div>
+
+
+
+
+
+
+<script>
+
+
+function toggleNotifications(){
+
+
+let box = document.getElementById('notificationBox');
+
+
+box.classList.toggle('hidden');
+
+
+}
+
+
+</script>
 
 
 
