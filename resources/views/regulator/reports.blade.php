@@ -1,73 +1,31 @@
-<x-app-layout>
+@extends('layouts.app')
 
-    <div class="max-w-7xl mx-auto py-10">
-
-        <h1 class="text-2xl font-bold mb-6">
-            Fraud Reports
-        </h1>
-
-        <table class="w-full border">
-
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="p-2">Seller</th>
-                    <th class="p-2">Description</th>
-                    <th class="p-2">Status</th>
-                    <th class="p-2">Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @foreach ($reports as $report)
-                    <tr class="border">
-
-                        <td class="p-2">
-                            {{ $report->seller_name }}
-                        </td>
-
-                        <td class="p-2">
-                            {{ $report->description }}
-                        </td>
-
-                        <td class="p-2">
-                            {{ ucfirst($report->status) }}
-                        </td>
-
-                        <td class="p-2">
-
-                            <form action="{{ route('regulator.reports.resolve', $report->id) }}" method="POST"
-                                class="inline">
-
-                                @csrf
-                                @method('PATCH')
-
-                                <button class="bg-green-500 text-white px-3 py-1 rounded">
-                                    Resolve
-                                </button>
-
-                            </form>
-
-                            <form action="{{ route('regulator.reports.delete', $report->id) }}" method="POST"
-                                class="inline">
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">
-                                    Delete
-                                </button>
-
-                            </form>
-
-                        </td>
-
-                    </tr>
-                @endforeach
-
-            </tbody>
-        </table>
-
+@section('content')
+<div class="p-8 max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">Fraud & Scam Flags</h1>
+        <a href="{{ route('regulator.dashboard') }}" class="text-sm text-indigo-600 font-medium">&larr; Dashboard</a>
     </div>
 
-</x-app-layout>
+    <div class="grid grid-cols-1 gap-4">
+        @forelse($reports as $report)
+            <div class="bg-white p-6 rounded-xl border border-slate-200 border-l-4 border-l-rose-500 shadow-sm flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-semibold text-rose-600 tracking-wider uppercase">Reported Flag</span>
+                    <h3 class="font-bold text-slate-900 text-lg mt-0.5">Accused Seller: {{ $report->seller_name }}</h3>
+                    <p class="text-sm text-slate-600 mt-2"><strong class="text-slate-800">Reason:</strong> {{ $report->reason }}</p>
+                    <p class="text-sm text-slate-500 mt-1">{{ $report->description }}</p>
+                </div>
+                <div class="flex gap-2">
+                    <form action="{{ route('regulator.reports.resolve', $report->id) }}" method="POST">
+                        @csrf @method('PATCH')
+                        <button class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm">Mark Resolved</button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white p-8 rounded-xl border border-dashed border-slate-300 text-center text-slate-400">Clear queue! No open fraud flags received.</div>
+        @endforelse
+    </div>
+</div>
+@endsection

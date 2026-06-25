@@ -5,28 +5,28 @@
 <head>
 
 
-<meta charset="utf-8">
+    <meta charset="utf-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-
-<meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<title>
-{{ config('app.name','Portal') }}
-</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
-
-<link rel="preconnect" href="https://fonts.bunny.net">
-
-
-<link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700&display=swap" rel="stylesheet">
+    <title>
+        {{ config('app.name', 'Portal') }}
+    </title>
 
 
 
-@vite(['resources/css/app.css','resources/js/app.js'])
+    <link rel="preconnect" href="https://fonts.bunny.net">
+
+
+    <link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700&display=swap" rel="stylesheet">
+
+
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 
 
@@ -42,7 +42,7 @@
 
 
 
-<div class="min-h-screen bg-gradient-to-br 
+    <div class="min-h-screen bg-gradient-to-br 
 
 from-slate-100
 
@@ -56,12 +56,10 @@ to-purple-100">
 
 
 
-<!-- NAVBAR -->
+        <!-- NAVBAR -->
 
 
-<header
-
-class="bg-gradient-to-r
+        <header class="bg-gradient-to-r
 
 from-indigo-700
 
@@ -75,7 +73,7 @@ shadow-xl">
 
 
 
-<div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+            <div class="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
 
 
 
@@ -83,185 +81,152 @@ shadow-xl">
 
 
 
-<!-- LOGO -->
+                <!-- LOGO -->
 
 
-<div>
+                <div>
 
 
 
-<h1 class="text-3xl font-bold text-white">
+                    <h1 class="text-3xl font-bold text-white">
 
 
 
-@if(Auth::user()->role === 'seller')
+                        @if (Auth::user()->role === 'seller')
+                            🏬 Seller Dashboard
+                        @elseif(Auth::user()->role === 'buyer')
+                            🛒 Buyer Dashboard
+                        @elseif(Auth::user()->role === 'admin')
+                            🛡️ Admin Dashboard
+                        @elseif(Auth::user()->role === 'regulator')
+                            📊 Regulator Dashboard
+                        @else
+                            Dashboard
+                        @endif
 
-🏬 Seller Dashboard
 
 
-@elseif(Auth::user()->role === 'buyer')
+                    </h1>
 
-🛒 Buyer Dashboard
 
 
-@elseif(Auth::user()->role === 'admin')
 
-🛡️ Admin Dashboard
 
 
-@elseif(Auth::user()->role === 'regulator')
 
-📊 Regulator Dashboard
+                </div>
 
 
-@else
 
-Dashboard
 
 
-@endif
 
 
 
-</h1>
 
 
+                <!-- LINKS -->
 
 
+                <nav class="flex items-center gap-8 text-white font-semibold">
 
 
 
-</div>
 
 
+                    <a href="{{ route('dashboard') }}" class="hover:text-yellow-300 transition">
 
 
+                        Dashboard
 
 
+                    </a>
 
 
 
 
-<!-- LINKS -->
 
 
-<nav class="flex items-center gap-8 text-white font-semibold">
 
 
+                    @if (Auth::user()->role !== 'admin')
+                        <a href="{{ route('profile.edit') }}" class="hover:text-yellow-300 transition">
 
 
+                            Profile
 
-<a href="{{route('dashboard')}}"
 
-class="hover:text-yellow-300 transition">
+                        </a>
+                    @endif
 
 
-Dashboard
 
 
-</a>
 
 
 
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
 
 
 
+                        @csrf
 
 
-@if(Auth::user()->role !== 'admin')
 
 
+                        <button class="hover:text-yellow-300 transition">
 
-<a href="{{route('profile.edit')}}"
 
-class="hover:text-yellow-300 transition">
+                            Log Out
 
 
-Profile
+                        </button>
 
 
-</a>
 
+                    </form>
 
 
-@endif
 
 
 
 
 
+                </nav>
 
 
-<form method="POST"
 
-action="{{route('logout')}}"
 
-class="inline">
 
 
 
-@csrf
+            </div>
 
 
 
+        </header>
 
-<button
 
-class="hover:text-yellow-300 transition">
 
 
-Log Out
 
 
-</button>
 
 
 
-</form>
+        <!-- PAGE -->
 
 
+        <main class="py-10">
 
 
+            <div class="max-w-7xl mx-auto px-6">
 
 
 
-</nav>
 
 
-
-
-
-
-
-</div>
-
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<!-- PAGE -->
-
-
-<main class="py-10">
-
-
-<div class="max-w-7xl mx-auto px-6">
-
-
-
-
-
-<div
-
-class="bg-white/90
+                <div class="bg-white/90
 
 backdrop-blur
 
@@ -273,31 +238,21 @@ p-8">
 
 
 
-@yield('content')
+                    @yield('content')
 
 
 
-</div>
-
-
-
-
-
-</div>
-
-
-
-</main>
+                </div>
 
 
 
 
 
+            </div>
 
 
 
-
-</div>
+        </main>
 
 
 
@@ -305,27 +260,32 @@ p-8">
 
 
 
-<script>
 
 
-document.addEventListener('DOMContentLoaded',function(){
-
-
-if(localStorage.getItem('theme')==='dark'){
-
-
-document.documentElement.classList.add('dark');
-
-
-}
+    </div>
 
 
 
-});
 
 
 
-</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+
+            if (localStorage.getItem('theme') === 'dark') {
+
+
+                document.documentElement.classList.add('dark');
+
+
+            }
+
+
+
+        });
+    </script>
 
 
 

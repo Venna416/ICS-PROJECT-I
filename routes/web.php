@@ -496,6 +496,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/reviews/{id}', [RegulatorController::class, 'hideReview'])->name('regulator.reviews.hide');
     Route::get('/reviews/{id}', [RegulatorController::class, 'restoreReview'])->name('regulator.reviews.restore');
 
+    Route::get('/regulator/profile', [RegulatorController::class, 'showProfile'])->name('regulator.profile.show');
+    Route::put('/regulator/profile', [RegulatorController::class, 'updateProfile'])->name('regulator.profile.update');
+
+    Route::get(
+        '/regulator/sellers',
+
+        [RegulatorController::class, 'sellers'],
+    )->name('regulator.sellers');
 
 });
 
@@ -576,7 +584,7 @@ Route::get('/notifications/read/{id}', function ($id) {
 
             'buyer' => $user->buyerProfile ? redirect()->route('buyer.profile.show', $user->buyerProfile->id) : redirect()->route('buyer.profile.create'),
 
-            'regulator' => view('profile.edit', ['request' => request(), 'user' => $user]),
+            'regulator' => redirect()->route('regulator.profile.show'),
 
             default => abort(403),
         };
