@@ -48,15 +48,9 @@ return redirect()
 
 
 $reviews = Review::where(
-
-'brand_name',
-
-$sellerProfile->brand_name
-
+'seller_id', '=', Auth::id(), 'and'
 )
-
-->latest()
-
+->orderBy('created_at', 'desc')
 ->get();
 
 
@@ -78,7 +72,10 @@ $fraudReports = FraudReport::where(
 
 'brand_name',
 
-$sellerProfile->brand_name
+'=',
+$sellerProfile->brand_name,
+
+'and'
 
 )
 

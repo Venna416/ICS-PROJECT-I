@@ -576,7 +576,7 @@ Route::get('/notifications/read/{id}', function ($id) {
 
             'buyer' => $user->buyerProfile ? redirect()->route('buyer.profile.show', $user->buyerProfile->id) : redirect()->route('buyer.profile.create'),
 
-            'regulator' => redirect()->route('regulator.dashboard'),
+            'regulator' => view('profile.edit', ['request' => request(), 'user' => $user]),
 
             default => abort(403),
         };
@@ -584,6 +584,7 @@ Route::get('/notifications/read/{id}', function ($id) {
 
     Route::patch(
         '/profile',
+        
 
         [ProfileController::class, 'update'],
     )->name('profile.update');
