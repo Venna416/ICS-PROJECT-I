@@ -28,7 +28,7 @@
             
             <div class="space-y-1">
                 <h1 class="text-xl font-extrabold text-[#0a2540] tracking-tight">Welcome back</h1>
-                <p class="text-xs text-gray-500">Sign in to manage your verification credentials.</p>
+               
             </div>
 
             @if (session('status'))
