@@ -69,4 +69,14 @@ SellerDocument::class
 );
 
 }
+
+public function regulatorReviews()
+{
+
+return $this->hasMany(
+RegulatorReview::class,
+'seller_id'
+);
+
+}
 }

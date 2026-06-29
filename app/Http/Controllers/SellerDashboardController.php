@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\Review;
-
 use App\Models\FraudReport;
 
 
@@ -28,13 +27,12 @@ $sellerProfile = $user->sellerProfile;
 
 
 
-if(!$sellerProfile){
 
+if(!$sellerProfile)
 
-return redirect()
+{
 
-->route('seller.profile.create');
-
+abort(404,'Seller profile not found');
 
 }
 
@@ -44,14 +42,23 @@ return redirect()
 
 
 
-// REVIEWS BY BRAND
-
+// Reviews using brand name because reviews table has no seller_id
 
 $reviews = Review::where(
-'seller_id', '=', Auth::id(), 'and'
+
+'brand_name',
+
+$sellerProfile->brand_name
+
 )
-->orderBy('created_at', 'desc')
+
+->latest()
+
 ->get();
+
+
+
+
 
 
 
@@ -63,32 +70,17 @@ $reviewCount = $reviews->count();
 
 
 
+// Fraud reports
 
-
-// FRAUD REPORTS BY BRAND
-
-
-$fraudReports = FraudReport::where(
+$fraudCount = FraudReport::where(
 
 'brand_name',
 
-'=',
-$sellerProfile->brand_name,
-
-'and'
+$sellerProfile->brand_name
 
 )
 
-->latest()
-
-->get();
-
-
-
-$fraudCount = $fraudReports->count();
-
-
-
+->count();
 
 
 
@@ -99,33 +91,47 @@ $fraudCount = $fraudReports->count();
 $trustScore = $sellerProfile->trust_score;
 
 
+
 $riskScore = $sellerProfile->risk_score;
 
 
 
 
 
-if($riskScore === null){
 
-$riskLevel="Pending";
 
-}
+// Risk level
 
-elseif($riskScore <=3){
 
-$riskLevel="Low";
+if($riskScore === null)
 
-}
+{
 
-elseif($riskScore <=7){
-
-$riskLevel="Medium";
+$riskLevel = "Pending";
 
 }
 
-else{
+elseif($riskScore <= 3)
 
-$riskLevel="High";
+{
+
+$riskLevel = "Low";
+
+}
+
+elseif($riskScore <= 6)
+
+{
+
+$riskLevel = "Medium";
+
+}
+
+else
+
+{
+
+$riskLevel = "High";
 
 }
 
@@ -141,30 +147,19 @@ return view(
 
 compact(
 
-
 'sellerProfile',
-
 
 'reviews',
 
-
 'reviewCount',
-
-
-'fraudReports',
-
 
 'fraudCount',
 
-
 'trustScore',
-
 
 'riskScore',
 
-
 'riskLevel'
-
 
 )
 
@@ -173,6 +168,7 @@ compact(
 
 
 }
+
 
 
 

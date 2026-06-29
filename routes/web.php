@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Notification;
 
 use App\Models\SellerProfile;
 use App\Models\User;
+use App\Models\BuyerProfile;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SellerProfileController;
@@ -73,18 +74,81 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-    Route::get('/buyer/dashboard', function () {
-        $user = Auth::user();
+   Route::get('/buyer/dashboard', function () {
 
-        if ($user->role !== 'buyer') {
-            abort(403);
-        }
 
-        return view('buyer.dashboard', [
-            'profile' => $user->buyerProfile,
-        ]);
-    })->name('buyer.dashboard');
+    $user = Auth::user();
 
+
+
+    // only buyers allowed
+
+    if ($user->role !== 'buyer') {
+
+        abort(403);
+
+    }
+
+
+
+
+
+    // check buyer profile
+
+    $profile = BuyerProfile::where(
+
+        'user_id',
+
+        $user->id
+
+    )->first();
+
+
+
+
+
+    // no profile yet
+
+    if (!$profile) {
+
+
+        return redirect()
+
+        ->route('buyer.profile.create')
+
+        ->with(
+
+            'error',
+
+            'Please complete your buyer profile before accessing the dashboard.'
+
+        );
+
+
+    }
+
+
+
+
+
+
+    return view(
+
+        'buyer.dashboard',
+
+        [
+
+            'profile' => $profile
+
+        ]
+
+    );
+
+
+
+})->middleware('auth')
+
+->name('buyer.dashboard');
     Route::get('/buyer/profile/create', [BuyerProfileController::class, 'create'])
     ->name('buyer.profile.create');
 
@@ -191,11 +255,13 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-    Route::get(
-        '/seller/dashboard',
+    Route::get('/seller/dashboard',
 
-        [SellerDashboardController::class, 'index'],
-    )->name('seller.dashboard');
+[SellerDashboardController::class,'index']
+
+)->middleware('profile.complete')
+
+->name('seller.dashboard');
 
     /*
 |--------------------------------------------------------------------------
@@ -311,37 +377,45 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-    Route::get(
-        '/buyer/seller/{id}/reviews',
+    Route::get('/buyer/seller/{id}/reviews', function($id){
 
-        function ($id) {
-            $seller = SellerProfile::findOrFail($id);
 
-            $reviews = \App\Models\Review::where(
-                'seller_id',
+$seller = App\Models\SellerProfile::findOrFail($id);
 
-                '=',
 
-                $seller->id,
 
-                'and',
-            )
+$reviews = App\Models\Review::where(
 
-                ->latest()
+'brand_name',
 
-                ->get();
+$seller->brand_name
 
-            return view(
-                'buyer.seller-reviews',
+)
 
-                compact(
-                    'seller',
+->latest()
 
-                    'reviews',
-                ),
-            );
-        },
-    )->name('buyer.seller.reviews');
+->get();
+
+
+
+
+
+return view(
+
+'buyer.seller-reviews',
+
+compact(
+
+'seller',
+
+'reviews'
+
+)
+
+);
+
+
+})->name('buyer.seller.reviews');
 
     /*
 |--------------------------------------------------------------------------
@@ -446,68 +520,250 @@ Route::middleware('auth')->group(function () {
             [AdminController::class, 'showFraud'],
         )
         ->name('admin.fraud.show');
+        Route::get(
+
+'/admin/regulator-concerns',
+
+[AdminController::class,'regulatorConcerns']
+
+)
+
+->name('admin.regulator.concerns');
     });
 
-    /*
+/*
 |--------------------------------------------------------------------------
 | REGULATOR
 |--------------------------------------------------------------------------
 */
 
-    Route::get(
-        '/regulator/dashboard',
 
-        [RegulatorController::class, 'dashboard'],
-    )->name('regulator.dashboard');
+Route::get(
+    '/regulator/dashboard',
+    [RegulatorController::class, 'dashboard']
+)->name('regulator.dashboard');
 
-    Route::get(
-        '/regulator/sellers',
 
-        [RegulatorController::class, 'sellers'],
-    )->name('regulator.sellers');
 
-    Route::get(
-        '/regulator/reports',
 
-        [RegulatorController::class, 'reports'],
-    )->name('regulator.reports');
 
-    Route::patch(
-        '/regulator/reports/{id}/resolve',
+/*
+|--------------------------------------------------------------------------
+| SELLERS
+|--------------------------------------------------------------------------
+*/
 
-        [RegulatorController::class, 'resolveReport'],
-    )->name('regulator.reports.resolve');
 
-    Route::delete(
-        '/regulator/reports/{id}/delete',
+Route::get(
+    '/regulator/sellers',
+    [RegulatorController::class, 'sellers']
+)->name('regulator.sellers');
 
-        [RegulatorController::class, 'deleteReport'],
-    )->name('regulator.reports.delete');
 
-    Route::get(
-        '/regulator/reviews',
 
-        [RegulatorController::class, 'reviews'],
-    )->name('regulator.reviews');
 
-    Route::put('/sellers/{id}/verify', [RegulatorController::class, 'verify'])->name('regulator.sellers.verify');
-    Route::put('/sellers/{id}/reject', [RegulatorController::class, 'reject'])->name('regulator.sellers.reject');
-    Route::delete('/reviews/{id}', [RegulatorController::class, 'deleteReview'])->name('regulator.reviews.delete');
-    Route::put('/reviews/{id}', [RegulatorController::class, 'hideReview'])->name('regulator.reviews.hide');
-    Route::get('/reviews/{id}', [RegulatorController::class, 'restoreReview'])->name('regulator.reviews.restore');
+// View seller full investigation
 
-    Route::get('/regulator/profile', [RegulatorController::class, 'showProfile'])->name('regulator.profile.show');
-    Route::put('/regulator/profile', [RegulatorController::class, 'updateProfile'])->name('regulator.profile.update');
+Route::get(
+    '/regulator/seller/{id}',
+    [RegulatorController::class,'showSeller']
+)->name('regulator.seller.show');
 
-    Route::get(
-        '/regulator/sellers',
 
-        [RegulatorController::class, 'sellers'],
-    )->name('regulator.sellers');
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| SELLER VERIFICATION ACTIONS
+|--------------------------------------------------------------------------
+*/
+
+
+Route::put(
+    '/regulator/sellers/{id}/verify',
+    [RegulatorController::class,'verify']
+)->name('regulator.sellers.verify');
+
+
+
+
+Route::put(
+    '/regulator/sellers/{id}/reject',
+    [RegulatorController::class,'reject']
+)->name('regulator.sellers.reject');
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| REGULATOR REVIEW DECISION
+|--------------------------------------------------------------------------
+*/
+
+
+Route::post(
+    '/regulator/seller/{id}/review',
+    [RegulatorController::class,'storeReview']
+)->name('regulator.seller.review');
+
+
+
+
+Route::get(
+    '/regulator/review/{id}/edit',
+    [RegulatorController::class,'editReview']
+)->name('regulator.review.edit');
+
+
+
+
+Route::put(
+    '/regulator/review/{id}',
+    [RegulatorController::class,'updateReview']
+)->name('regulator.review.update');
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| FRAUD REPORTS
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get(
+    '/regulator/reports',
+    [RegulatorController::class,'reports']
+)->name('regulator.reports');
+
+
+
+Route::patch(
+    '/regulator/reports/{id}/resolve',
+    [RegulatorController::class,'resolveReport']
+)->name('regulator.reports.resolve');
+
+
+
+Route::delete(
+    '/regulator/reports/{id}',
+    [RegulatorController::class,'deleteReport']
+)->name('regulator.reports.delete');
+
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| REVIEWS MODERATION
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get(
+    '/regulator/reviews',
+    [RegulatorController::class,'reviews']
+)->name('regulator.reviews');
+
+
+
+
+
+Route::put(
+    '/regulator/review/{id}/hide',
+    [RegulatorController::class,'hideReview']
+)->name('regulator.review.hide');
+
+
+
+
+
+Route::put(
+    '/regulator/review/{id}/restore',
+    [RegulatorController::class,'restoreReview']
+)->name('regulator.review.restore');
+
+
+
+
+
+Route::delete(
+    '/regulator/review/{id}',
+    [RegulatorController::class,'deleteReview']
+)->name('regulator.review.delete');
+
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| PROFILE
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get(
+    '/regulator/profile',
+    [RegulatorController::class,'showProfile']
+)->name('regulator.profile.show');
+
+
+
+
+Route::put(
+    '/regulator/profile',
+    [RegulatorController::class,'updateProfile']
+)->name('regulator.profile.update');
+
+Route::get(
+
+'/regulator/reports',
+
+[RegulatorController::class,'reports']
+
+)->name('regulator.reports');
+
+
+
+
+Route::get(
+
+'/regulator/reports/{id}/investigate',
+
+[RegulatorController::class,'investigate']
+
+)->name('regulator.reports.investigate');
+
+
+
+
+
+Route::put(
+
+'/regulator/reports/{id}/investigate',
+
+[RegulatorController::class,'updateInvestigation']
+
+)->name('regulator.reports.update');
 
 });
-
-
 
 
    /*

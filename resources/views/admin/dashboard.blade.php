@@ -1,12 +1,9 @@
 @extends('layouts.app')
 
-
 @section('content')
 
 
-<div class="min-h-screen 
-bg-gradient-to-br from-slate-100 via-indigo-50 to-purple-100 
-p-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-8">
 
 
 <div class="max-w-7xl mx-auto">
@@ -15,30 +12,15 @@ p-8">
 
 <!-- HEADER -->
 
+<div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-700
 
-<div class="bg-gradient-to-r 
-from-indigo-700 
-via-purple-700 
-to-blue-700
-
-rounded-3xl
-
-shadow-2xl
-
-p-10
-
-text-white
-
-mb-10">
-
+rounded-3xl shadow-2xl p-10 text-white mb-10">
 
 
 <div class="flex justify-between items-center">
 
 
-
 <div>
-
 
 <h1 class="text-4xl font-bold">
 
@@ -49,7 +31,7 @@ mb-10">
 
 <p class="mt-3 text-indigo-100">
 
-Manage seller verification, reviews and fraud monitoring.
+Manage seller verification, buyer activity and regulator concerns.
 
 </p>
 
@@ -61,10 +43,7 @@ Manage seller verification, reviews and fraud monitoring.
 
 
 
-
-
-<!-- BELL -->
-
+<!-- NOTIFICATION BELL -->
 
 <div class="relative">
 
@@ -73,21 +52,11 @@ Manage seller verification, reviews and fraud monitoring.
 
 onclick="toggleAdminNotifications()"
 
-class="relative
+class="relative bg-white/20 backdrop-blur-md
 
-bg-white/20
+p-4 rounded-full text-3xl
 
-backdrop-blur
-
-p-4
-
-rounded-full
-
-text-3xl
-
-hover:bg-white/30
-
-transition">
+hover:bg-white/30 transition">
 
 
 🔔
@@ -97,25 +66,15 @@ transition">
 @if(auth()->user()->unreadNotifications->count() > 0)
 
 
-<span class="absolute
+<span
 
--top-1
+class="absolute -top-1 -right-1
 
--right-1
+bg-red-600 text-white
 
-bg-red-600
+text-xs font-bold
 
-text-white
-
-font-bold
-
-text-xs
-
-w-6
-
-h-6
-
-rounded-full
+w-6 h-6 rounded-full
 
 flex items-center justify-center">
 
@@ -136,31 +95,16 @@ flex items-center justify-center">
 
 
 
-
 <div id="adminNotifications"
 
-class="hidden
 
-absolute
+class="hidden absolute right-0 mt-5
 
-right-0
+w-96 bg-white rounded-3xl
 
-mt-4
+shadow-2xl p-5
 
-w-96
-
-bg-white
-
-rounded-3xl
-
-shadow-2xl
-
-p-5
-
-text-gray-800
-
-z-50">
-
+text-gray-800 z-50">
 
 
 <h2 class="font-bold text-xl mb-4">
@@ -174,9 +118,12 @@ z-50">
 @forelse(auth()->user()->unreadNotifications as $notification)
 
 
-<a href="{{route('notifications.read',$notification->id)}}"
 
-class="block bg-indigo-50 rounded-2xl p-4 mb-3">
+<a
+
+href="{{route('notifications.read',$notification->id)}}"
+
+class="block bg-indigo-50 rounded-2xl p-4 mb-3 hover:bg-indigo-100">
 
 
 <p class="font-bold">
@@ -186,14 +133,16 @@ class="block bg-indigo-50 rounded-2xl p-4 mb-3">
 </p>
 
 
-<p class="text-sm text-gray-600 mt-1">
+<p class="text-sm text-gray-600 mt-2">
 
 {{$notification->data['message']}}
 
 </p>
 
 
+
 </a>
+
 
 
 @empty
@@ -214,9 +163,6 @@ No new notifications
 
 
 
-</div>
-
-
 
 
 </div>
@@ -225,6 +171,7 @@ No new notifications
 </div>
 
 
+</div>
 
 
 
@@ -232,12 +179,12 @@ No new notifications
 
 
 
-<!-- CARDS -->
+
+
+<!-- DASHBOARD CARDS -->
 
 
 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-
 
 
 
@@ -248,17 +195,15 @@ No new notifications
 
 <a href="{{route('admin.pending')}}"
 
-class="group bg-white rounded-3xl shadow-xl p-8
+class="bg-white rounded-3xl shadow-lg p-8
 
 hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex justify-between">
 
 
 <div>
-
 
 <p class="text-gray-500">
 
@@ -277,7 +222,6 @@ Pending Verification
 </div>
 
 
-
 <div class="text-5xl">
 
 ⏳
@@ -288,8 +232,7 @@ Pending Verification
 </div>
 
 
-
-<p class="mt-6 text-gray-500">
+<p class="mt-6 text-gray-600">
 
 Review seller applications
 
@@ -304,20 +247,17 @@ Review seller applications
 
 
 
-
-
 <!-- VERIFIED -->
 
 
 <a href="{{route('admin.verified')}}"
 
-class="group bg-white rounded-3xl shadow-xl p-8
+class="bg-white rounded-3xl shadow-lg p-8
 
 hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex justify-between">
 
 
 <div>
@@ -340,7 +280,6 @@ Verified Sellers
 </div>
 
 
-
 <div class="text-5xl">
 
 ✅
@@ -352,9 +291,9 @@ Verified Sellers
 
 
 
-<p class="mt-6 text-gray-500">
+<p class="mt-6 text-gray-600">
 
-View trusted sellers
+Trusted businesses
 
 </p>
 
@@ -368,19 +307,17 @@ View trusted sellers
 
 
 
-
 <!-- REJECTED -->
 
 
 <a href="{{route('admin.rejected')}}"
 
-class="group bg-white rounded-3xl shadow-xl p-8
+class="bg-white rounded-3xl shadow-lg p-8
 
 hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex justify-between">
 
 
 <div>
@@ -403,7 +340,6 @@ Rejected Sellers
 </div>
 
 
-
 <div class="text-5xl">
 
 ❌
@@ -414,10 +350,9 @@ Rejected Sellers
 </div>
 
 
+<p class="mt-6 text-gray-600">
 
-<p class="mt-6 text-gray-500">
-
-View rejected applications
+Rejected applications
 
 </p>
 
@@ -437,13 +372,12 @@ View rejected applications
 
 <a href="{{route('admin.reviews')}}"
 
-class="group bg-white rounded-3xl shadow-xl p-8
+class="bg-white rounded-3xl shadow-lg p-8
 
 hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex justify-between">
 
 
 <div>
@@ -466,7 +400,6 @@ Buyer Reviews
 </div>
 
 
-
 <div class="text-5xl">
 
 ⭐
@@ -478,7 +411,7 @@ Buyer Reviews
 
 
 
-<p class="mt-6 text-gray-500">
+<p class="mt-6 text-gray-600">
 
 Monitor customer feedback
 
@@ -500,13 +433,12 @@ Monitor customer feedback
 
 <a href="{{route('admin.fraudReports')}}"
 
-class="group bg-white rounded-3xl shadow-xl p-8
+class="bg-white rounded-3xl shadow-lg p-8
 
 hover:shadow-2xl hover:-translate-y-2 transition">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex justify-between">
 
 
 <div>
@@ -529,7 +461,6 @@ Fraud Reports
 </div>
 
 
-
 <div class="text-5xl">
 
 🚨
@@ -540,10 +471,9 @@ Fraud Reports
 </div>
 
 
+<p class="mt-6 text-gray-600">
 
-<p class="mt-6 text-gray-500">
-
-Investigate reports
+Investigate suspicious activity
 
 </p>
 
@@ -556,15 +486,79 @@ Investigate reports
 
 
 
+
+
+<!-- REGULATOR CONCERNS -->
+
+
+<a href="{{route('admin.regulator.concerns')}}"
+
+class="bg-white rounded-3xl shadow-lg p-8
+
+hover:shadow-2xl hover:-translate-y-2 transition">
+
+
+
+<div class="flex justify-between">
+
+
+<div>
+
+
+<p class="text-gray-500">
+
+Seller Concerns
+
+</p>
+
+
+<h2 class="text-5xl font-bold text-orange-600 mt-4">
+
+{{$regulatorConcerns}}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="text-5xl">
+
+⚠️
+
+</div>
+
+
+
+</div>
+
+
+
+<p class="mt-6 text-gray-600">
+
+Regulators disagree with verification decisions
+
+</p>
+
+
+</a>
+
+
+
+
+
 </div>
 
 
 
 
+
 </div>
 
 
 </div>
+
 
 
 
