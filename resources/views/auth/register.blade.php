@@ -28,7 +28,7 @@
             
             <div class="space-y-1">
                 <h1 class="text-xl font-extrabold text-[#0a2540] tracking-tight">Create your account</h1>
-                <p class="text-xs text-gray-500">Sign up today to access merchant safety reports.</p>
+               
             </div>
 
             <form method="POST" action="{{ route('register') }}" class="space-y-4">
