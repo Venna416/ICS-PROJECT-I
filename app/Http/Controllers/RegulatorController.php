@@ -22,10 +22,6 @@ class RegulatorController extends Controller
 {
 
 
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD
@@ -41,46 +37,36 @@ $totalSellers = SellerProfile::count();
 
 
 $verifiedSellers = SellerProfile::where(
-
 'verification_status',
-
 'verified'
-
 )->count();
-
 
 
 $pendingSellers = SellerProfile::where(
-
 'verification_status',
-
 'pending'
-
 )->count();
-
 
 
 $rejectedSellers = SellerProfile::where(
-
 'verification_status',
-
 'rejected'
-
 )->count();
 
 
 
 
-$totalReviews = Review::count();
+$totalReviews = Review::where(
+'status',
+'active'
+)->count();
+
 
 
 
 $pendingReviews = Review::where(
-
 'status',
-
 'pending'
-
 )->count();
 
 
@@ -98,17 +84,11 @@ return view(
 compact(
 
 'totalSellers',
-
 'verifiedSellers',
-
 'pendingSellers',
-
 'rejectedSellers',
-
 'totalReviews',
-
 'pendingReviews',
-
 'totalFraudReports'
 
 )
@@ -123,12 +103,9 @@ compact(
 
 
 
-
-
-
 /*
 |--------------------------------------------------------------------------
-| SELLERS LIST
+| SELLERS
 |--------------------------------------------------------------------------
 */
 
@@ -157,299 +134,9 @@ compact('sellers')
 
 
 
-
-
-
-/*
-|--------------------------------------------------------------------------
-| SELLER INVESTIGATION PAGE
-|--------------------------------------------------------------------------
-*/
-
-
-public function showSeller($id)
-
-{
-
-
-$seller = SellerProfile::with([
-
-'user',
-
-'documents'
-
-])->findOrFail($id);
-
-
-
-
-
-$regulatorReview = RegulatorReview::where(
-
-'seller_id',
-
-$id
-
-)
-
-->latest()
-
-->first();
-
-
-
-
-
-return view(
-
-'regulator.seller-show',
-
-compact(
-
-'seller',
-
-'regulatorReview'
-
-)
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| REGULATOR REVIEW
-|--------------------------------------------------------------------------
-*/
-
-
-public function storeReview(Request $request,$id)
-
-{
-
-
-$request->validate([
-
-
-'is_fair'=>'required',
-
-'reason'=>'required|string'
-
-
-]);
-
-
-
-
-
-
-
-RegulatorReview::create([
-
-
-'seller_id'=>$id,
-
-
-'regulator_id'=>Auth::id(),
-
-
-'is_fair'=>$request->is_fair,
-
-
-'reason'=>$request->reason,
-
-
-'reviewed'=>true
-
-
-
-]);
-
-
-
-
-
-
-
-
-
-
-// IF NOT FAIR SEND ADMIN NOTIFICATION
-
-
-if($request->is_fair == 0)
-
-{
-
-
-$admins = User::where(
-
-'role',
-
-'admin'
-
-)->get();
-
-
-
-
-
-
-foreach($admins as $admin)
-
-{
-
-
-$admin->notify(
-
-new AdminActivityNotification(
-
-
-"🚨 Regulator Concern",
-
-
-"A regulator has questioned a seller verification decision."
-
-
-)
-
-);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-return redirect()
-
-->route('regulator.sellers')
-
-->with(
-
-'success',
-
-'Regulator review submitted successfully.'
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| APPROVE / REJECT
-|--------------------------------------------------------------------------
-*/
-
-
-public function verify($id): RedirectResponse
-
-{
-
-
-$seller = SellerProfile::findOrFail($id);
-
-
-
-$seller->update([
-
-
-'verification_status'=>'verified'
-
-
-]);
-
-
-
-return back()->with(
-
-'success',
-
-'Seller approved successfully.'
-
-);
-
-
-}
-
-
-
-
-
-public function reject($id): RedirectResponse
-
-{
-
-
-$seller = SellerProfile::findOrFail($id);
-
-
-
-$seller->update([
-
-
-'verification_status'=>'rejected'
-
-
-]);
-
-
-
-return back()->with(
-
-'success',
-
-'Seller rejected successfully.'
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | FRAUD REPORTS
-|--------------------------------------------------------------------------
-*/
-
-
-/*
-|--------------------------------------------------------------------------
-| FRAUD REPORT TABLE
 |--------------------------------------------------------------------------
 */
 
@@ -458,13 +145,11 @@ public function reports()
 {
 
 
-$reports = FraudReport::with([
+$reports = FraudReport::with(
 
-'user',
+'user'
 
-'sellerProfile'
-
-])
+)
 
 ->latest()
 
@@ -489,10 +174,9 @@ compact('reports')
 
 
 
-
 /*
 |--------------------------------------------------------------------------
-| OPEN INVESTIGATION
+| INVESTIGATION PAGE
 |--------------------------------------------------------------------------
 */
 
@@ -501,13 +185,11 @@ public function investigate($id)
 {
 
 
-$report = FraudReport::with([
+$report = FraudReport::with(
 
-'user',
+'user'
 
-'sellerProfile'
-
-])
+)
 
 ->findOrFail($id);
 
@@ -530,12 +212,9 @@ compact('report')
 
 
 
-
-
-
 /*
 |--------------------------------------------------------------------------
-| SAVE INVESTIGATION
+| COMPLETE INVESTIGATION
 |--------------------------------------------------------------------------
 */
 
@@ -559,7 +238,9 @@ $request->validate([
 
 
 
+
 $report = FraudReport::findOrFail($id);
+
 
 
 
@@ -579,7 +260,6 @@ $report->update([
 
 
 ]);
-
 
 
 
@@ -623,15 +303,32 @@ new AdminActivityNotification(
 
 /*
 |--------------------------------------------------------------------------
+| FIND SELLER
+|--------------------------------------------------------------------------
+*/
+
+
+$seller = SellerProfile::where(
+
+'brand_name',
+
+$report->brand_name
+
+)->first();
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
 | SELLER NOTIFICATION
 |--------------------------------------------------------------------------
 */
 
 
-$seller = $report->sellerProfile;
-
-
-
 if($seller && $seller->user)
 
 {
@@ -641,159 +338,17 @@ $seller->user->notify(
 
 new AdminActivityNotification(
 
-"⚠️ Business Compliance Notice",
+"⚠️ Fraud Investigation Result",
 
-"A buyer reported your business. Regulator decision: {$request->decision}. Action taken: {$request->action_taken}. Reason: {$report->description}"
-
-)
-
-);
-
-
-}
-
-
-
-
-
-
-
-return redirect()
-
-->route('regulator.reports')
-
-->with(
-
-'success',
-
-'Investigation submitted successfully.'
-
-);
-
-
-
-}
-
-
-
-
-public function resolveReport(Request $request,$id)
-{
-
-
-$request->validate([
-
-'decision'=>'required',
-
-'action_taken'=>'required',
-
-'regulator_note'=>'required|string'
-
-]);
-
-
-
-$report = FraudReport::findOrFail($id);
-
-
-
-$report->update([
-
-
-'status'=>'resolved',
-
-'decision'=>$request->decision,
-
-'action_taken'=>$request->action_taken,
-
-'regulator_note'=>$request->regulator_note
-
-
-]);
-
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| NOTIFY BUYER
-|--------------------------------------------------------------------------
-*/
-
-
-if($report->user)
-
-{
-
-$report->user->notify(
-
-new AdminActivityNotification(
-
-"🚨 Fraud Report Update",
-
-"Your fraud report against {$report->brand_name} has been reviewed. Decision: {$request->decision}"
+"Your business {$seller->brand_name} was investigated. Decision: {$request->decision}. Action taken: {$request->action_taken}."
 
 )
 
 );
 
-}
-
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| NOTIFY SELLER
-|--------------------------------------------------------------------------
-*/
-
-
-$seller = $report->sellerProfile;
-
-
-
-if($seller && $seller->user)
-
-{
-
-
-if(
-$request->action_taken == "Seller Warned"
-||
-$request->action_taken == "Suspend Seller"
-)
-
-{
-
-
-$seller->user->notify(
-
-new AdminActivityNotification(
-
-"⚠️ Seller Compliance Notice",
-
-"A regulator reviewed a fraud report against your business. Action taken: {$request->action_taken}"
-
-)
-
-);
 
 
 }
-
-
-
-
-}
-
-
 
 
 
@@ -834,45 +389,20 @@ $seller->update([
 
 
 
+return redirect()
 
+->route('regulator.reports')
 
-return back()->with(
+->with(
 
 'success',
 
-'Fraud investigation completed successfully.'
+'Investigation completed successfully.'
 
 );
 
 
 }
-
-
-
-
-public function deleteReport($id)
-
-{
-
-
-$report = FraudReport::findOrFail($id);
-
-
-$report->delete();
-
-
-
-return back()->with(
-
-'success',
-
-'Report deleted successfully.'
-
-);
-
-
-}
-
 
 
 
@@ -888,12 +418,67 @@ return back()->with(
 */
 
 
-public function reviews()
+public function reviews(Request $request)
+{
+
+
+$query = Review::query();
+
+
+
+if($request->filled('search'))
 
 {
 
 
-$reviews = Review::latest()->get();
+$search=$request->search;
+
+
+
+$query->where(function($q) use($search){
+
+
+$q->where(
+'brand_name',
+'like',
+"%$search%"
+)
+
+
+->orWhere(
+'seller_name',
+'like',
+"%$search%"
+)
+
+
+->orWhere(
+'review',
+'like',
+"%$search%"
+);
+
+
+});
+
+
+}
+
+
+
+
+
+$reviews = $query
+
+->where(
+'status',
+'active'
+)
+
+->latest()
+
+->get();
+
 
 
 
@@ -906,38 +491,40 @@ compact('reviews')
 );
 
 
-
 }
+
+
+
 
 
 
 
 
 public function hideReview($id)
-
 {
 
 
 $review = Review::findOrFail($id);
 
 
-$review->status='hidden';
+$review->update([
 
+'status'=>'hidden'
 
-$review->save();
-
+]);
 
 
 return back()->with(
 
 'success',
 
-'Review hidden successfully.'
+'Review hidden.'
 
 );
 
 
 }
+
 
 
 
@@ -945,17 +532,17 @@ return back()->with(
 
 
 public function restoreReview($id)
-
 {
 
 
 $review = Review::findOrFail($id);
 
 
-$review->status='active';
+$review->update([
 
+'status'=>'active'
 
-$review->save();
+]);
 
 
 
@@ -963,7 +550,7 @@ return back()->with(
 
 'success',
 
-'Review restored successfully.'
+'Review restored.'
 
 );
 
@@ -974,8 +561,9 @@ return back()->with(
 
 
 
-public function deleteReview($id)
 
+
+public function deleteReview($id)
 {
 
 
@@ -990,14 +578,12 @@ return back()->with(
 
 'success',
 
-'Review deleted successfully.'
+'Review deleted.'
 
 );
 
 
 }
-
-
 
 
 
@@ -1007,138 +593,12 @@ return back()->with(
 
 /*
 |--------------------------------------------------------------------------
-| PROFILE
+| REGULATOR SELLER CONCERN
 |--------------------------------------------------------------------------
 */
 
 
-public function showProfile()
-
-{
-
-
-$user = Auth::user();
-
-
-
-return view(
-
-'regulator.profile',
-
-compact('user')
-
-);
-
-
-
-}
-
-
-
-
-
-
-public function updateProfile(Request $request)
-
-{
-
-
-$user = Auth::user();
-
-
-
-$request->validate([
-
-
-'name'=>'required',
-
-'email'=>'required|email',
-
-'password'=>'nullable|min:8'
-
-
-]);
-
-
-
-
-$user->name=$request->name;
-
-
-$user->email=$request->email;
-
-
-
-if($request->filled('password'))
-
-{
-
-
-$user->password=bcrypt($request->password);
-
-
-}
-
-
-
-$user->save();
-
-
-
-return back()->with(
-
-'success',
-
-'Profile updated successfully.'
-
-);
-
-
-}
-
-/*
-|--------------------------------------------------------------------------
-| EDIT REGULATOR REVIEW
-|--------------------------------------------------------------------------
-*/
-
-
-public function editReview($id)
-
-{
-
-
-$review = RegulatorReview::findOrFail($id);
-
-
-
-return view(
-
-'regulator.edit-review',
-
-compact('review')
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| UPDATE REGULATOR REVIEW
-|--------------------------------------------------------------------------
-*/
-
-
-public function updateReview(Request $request,$id)
-
+public function storeReview(Request $request,$id)
 {
 
 
@@ -1146,7 +606,6 @@ $request->validate([
 
 
 'is_fair'=>'required',
-
 
 'reason'=>'required|string'
 
@@ -1156,21 +615,18 @@ $request->validate([
 
 
 
-
-$review = RegulatorReview::findOrFail($id);
-
+RegulatorReview::create([
 
 
+'seller_id'=>$id,
 
-
-$review->update([
-
+'regulator_id'=>Auth::id(),
 
 'is_fair'=>$request->is_fair,
 
+'reason'=>$request->reason,
 
-'reason'=>$request->reason
-
+'reviewed'=>false
 
 
 ]);
@@ -1179,26 +635,63 @@ $review->update([
 
 
 
-return redirect()
 
-->route(
 
-'regulator.seller.show',
+if($request->is_fair == 0)
 
-$review->seller_id
+{
+
+
+$admins = User::where(
+
+'role',
+
+'admin'
+
+)->get();
+
+
+
+foreach($admins as $admin)
+
+{
+
+
+$admin->notify(
+
+new AdminActivityNotification(
+
+"🚨 Regulator Concern",
+
+"A regulator questioned a seller verification decision."
 
 )
-
-->with(
-
-'success',
-
-'Regulator review updated successfully.'
 
 );
 
 
 }
+
+
+}
+
+
+
+
+
+return back()->with(
+
+'success',
+
+'Concern submitted.'
+
+);
+
+
+}
+
+
+
 
 
 }

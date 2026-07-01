@@ -149,15 +149,17 @@ shadow-xl">
 
 
 
-                    @if (Auth::user()->role !== 'admin')
-                        <a href="{{ route('profile.edit') }}" class="hover:text-yellow-300 transition">
+                    @if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'regulator')
+
+    <a href="{{ route('profile.edit') }}" class="hover:text-yellow-300 transition">
 
 
-                            Profile
+        Profile
 
 
-                        </a>
-                    @endif
+    </a>
+
+@endif
 
 
 

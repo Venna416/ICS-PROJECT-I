@@ -353,30 +353,7 @@ class="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700">
 
 
 
-<form action="{{route('seller.profile.destroy',$profile->id)}}"
 
-method="POST">
-
-
-@csrf
-
-@method('DELETE')
-
-
-<button
-
-onclick="return confirm('Are you sure?')"
-
-class="bg-red-600 text-white px-8 py-3 rounded-xl">
-
-
-🗑 Delete
-
-
-</button>
-
-
-</form>
 
 
 

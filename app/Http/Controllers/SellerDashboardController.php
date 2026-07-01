@@ -27,7 +27,6 @@ $sellerProfile = $user->sellerProfile;
 
 
 
-
 if(!$sellerProfile)
 
 {
@@ -41,14 +40,21 @@ abort(404,'Seller profile not found');
 
 
 
-
-// Reviews using brand name because reviews table has no seller_id
+// ONLY ACTIVE REVIEWS
 
 $reviews = Review::where(
 
 'brand_name',
 
 $sellerProfile->brand_name
+
+)
+
+->where(
+
+'status',
+
+'active'
 
 )
 
@@ -61,9 +67,7 @@ $sellerProfile->brand_name
 
 
 
-
 $reviewCount = $reviews->count();
-
 
 
 
@@ -87,9 +91,7 @@ $sellerProfile->brand_name
 
 
 
-
 $trustScore = $sellerProfile->trust_score;
-
 
 
 $riskScore = $sellerProfile->risk_score;
@@ -97,10 +99,6 @@ $riskScore = $sellerProfile->risk_score;
 
 
 
-
-
-
-// Risk level
 
 
 if($riskScore === null)
@@ -140,7 +138,6 @@ $riskLevel = "High";
 
 
 
-
 return view(
 
 'seller.dashboard',
@@ -168,7 +165,6 @@ compact(
 
 
 }
-
 
 
 

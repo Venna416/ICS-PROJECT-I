@@ -28,7 +28,7 @@ rounded-3xl shadow-xl p-8 text-white mb-8">
 
 <p class="mt-3 text-blue-100">
 
-Edit verification factors. Existing assessment choices are already selected.
+Update verification factors. Previous selections are already saved.
 
 </p>
 
@@ -42,15 +42,15 @@ Edit verification factors. Existing assessment choices are already selected.
 
 
 
+<!-- SELLER INFO -->
 
-<!-- SELLER -->
 
 <div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
 
 
 <h2 class="text-2xl font-bold mb-5">
 
-👤 Seller
+👤 Seller Information
 
 </h2>
 
@@ -59,12 +59,15 @@ Edit verification factors. Existing assessment choices are already selected.
 <div class="flex items-center gap-5">
 
 
-<div class="w-20 h-20 rounded-full bg-blue-100 
-flex items-center justify-center text-4xl">
+<div class="w-20 h-20 rounded-full 
+bg-blue-100 flex items-center justify-center text-4xl">
+
 
 🏪
 
+
 </div>
+
 
 
 
@@ -85,6 +88,13 @@ flex items-center justify-center text-4xl">
 </p>
 
 
+<p class="text-sm text-gray-400">
+
+{{$seller->user->email}}
+
+</p>
+
+
 </div>
 
 
@@ -102,14 +112,14 @@ flex items-center justify-center text-4xl">
 
 
 
-<!-- SCORE -->
+<!-- SCORES -->
 
 
 <div class="grid md:grid-cols-3 gap-6 mb-8">
 
 
-
 <div class="bg-blue-50 rounded-3xl p-6">
+
 
 <h3 class="font-bold text-blue-700">
 
@@ -120,7 +130,7 @@ flex items-center justify-center text-4xl">
 
 <p class="text-4xl font-bold mt-3">
 
-{{$seller->trust_score ?? 0}}%
+{{$seller->trust_score ?? 0}}
 
 </p>
 
@@ -131,8 +141,8 @@ flex items-center justify-center text-4xl">
 
 
 
-
 <div class="bg-red-50 rounded-3xl p-6">
+
 
 <h3 class="font-bold text-red-700">
 
@@ -154,8 +164,8 @@ flex items-center justify-center text-4xl">
 
 
 
-
 <div class="bg-green-50 rounded-3xl p-6">
+
 
 <h3 class="font-bold text-green-700">
 
@@ -166,9 +176,7 @@ Status
 
 <p class="text-2xl font-bold mt-3">
 
-
-{{$seller->verification_status}}
-
+{{ucfirst($seller->verification_status)}}
 
 </p>
 
@@ -176,8 +184,6 @@ Status
 </div>
 
 
-
-
 </div>
 
 
@@ -186,6 +192,10 @@ Status
 
 
 
+
+
+
+<!-- FORM -->
 
 
 <form method="POST"
@@ -197,6 +207,18 @@ action="{{route('admin.updateVerification',$seller->id)}}">
 
 @method('PUT')
 
+
+{{-- remembers where admin came from --}}
+
+<input
+
+type="hidden"
+
+name="from"
+
+value="{{request('from')}}"
+
+>
 
 
 
@@ -212,7 +234,8 @@ action="{{route('admin.updateVerification',$seller->id)}}">
 
 
 
-<!-- TRUST -->
+<!-- TRUST FACTORS -->
+
 
 <div class="bg-blue-50 rounded-3xl p-8">
 
@@ -228,35 +251,30 @@ action="{{route('admin.updateVerification',$seller->id)}}">
 
 
 
+@php
 
-<label class="flex items-center gap-3 mb-5">
+$trustFactors = [
 
+'valid_documents'=>'Valid documents (+20)',
 
-<input
+'complete_profile'=>'Complete seller profile (+10)',
 
-type="checkbox"
+'business_license'=>'Business license verified (+20)',
 
-name="valid_documents"
+'good_reviews'=>'3+ reviews with average 4+ stars (+20)',
 
-value="1"
+'limited_reviews'=>'Limited reviews / below 4 stars (+10)'
 
-class="w-5 h-5"
+];
 
-
-{{ $seller->valid_documents ? 'checked' : '' }}
-
->
-
-
-Valid documents (+20)
-
-
-</label>
+@endphp
 
 
 
 
 
+
+@foreach($trustFactors as $field=>$label)
 
 
 <label class="flex items-center gap-3 mb-5">
@@ -266,116 +284,30 @@ Valid documents (+20)
 
 type="checkbox"
 
-name="complete_profile"
+name="{{$field}}"
 
 value="1"
 
 class="w-5 h-5"
 
 
-{{ $seller->complete_profile ? 'checked' : '' }}
+@if($seller->$field)
+
+checked
+
+@endif
 
 >
 
 
-Complete seller profile (+10)
+{{$label}}
+
 
 
 </label>
 
 
-
-
-
-
-
-
-<label class="flex items-center gap-3 mb-5">
-
-
-<input
-
-type="checkbox"
-
-name="business_license"
-
-value="1"
-
-class="w-5 h-5"
-
-
-{{ $seller->business_license ? 'checked' : '' }}
-
->
-
-
-Business license verified (+20)
-
-
-</label>
-
-
-
-
-
-
-
-
-<label class="flex items-center gap-3 mb-5">
-
-
-<input
-
-type="checkbox"
-
-name="good_reviews"
-
-value="1"
-
-class="w-5 h-5"
-
-
-{{ $seller->good_reviews ? 'checked' : '' }}
-
->
-
-
-3+ reviews with average 4+ stars (+20)
-
-
-</label>
-
-
-
-
-
-
-
-
-<label class="flex items-center gap-3">
-
-
-<input
-
-type="checkbox"
-
-name="limited_reviews"
-
-value="1"
-
-class="w-5 h-5"
-
-
-{{ $seller->limited_reviews ? 'checked' : '' }}
-
->
-
-
-Limited reviews / below 4 stars (+10)
-
-
-</label>
-
+@endforeach
 
 
 
@@ -390,7 +322,8 @@ Limited reviews / below 4 stars (+10)
 
 
 
-<!-- RISK -->
+<!-- RISK FACTORS -->
+
 
 <div class="bg-red-50 rounded-3xl p-8">
 
@@ -405,36 +338,32 @@ Limited reviews / below 4 stars (+10)
 
 
 
+@php
+
+$riskFactors=[
 
 
-<label class="flex items-center gap-3 mb-5">
+'missing_documents'=>'Missing documents (+3)',
+
+'fraud_reports'=>'Fraud reports received (+4)',
+
+'poor_reviews'=>'Poor customer reviews (+2)',
+
+'incomplete_information'=>'Incomplete business information (+2)'
 
 
-<input
-
-type="checkbox"
-
-name="missing_documents"
-
-value="1"
-
-class="w-5 h-5"
+];
 
 
-{{ $seller->missing_documents ? 'checked' : '' }}
-
->
-
-
-Missing documents (+3)
-
-
-</label>
+@endphp
 
 
 
 
 
+
+
+@foreach($riskFactors as $field=>$label)
 
 
 
@@ -445,85 +374,31 @@ Missing documents (+3)
 
 type="checkbox"
 
-name="fraud_reports"
+name="{{$field}}"
 
 value="1"
 
 class="w-5 h-5"
 
 
-{{ $seller->fraud_reports ? 'checked' : '' }}
+@if($seller->$field)
+
+checked
+
+@endif
 
 >
 
 
-Fraud reports received (+4)
+{{$label}}
+
 
 
 </label>
 
 
 
-
-
-
-
-
-<label class="flex items-center gap-3 mb-5">
-
-
-<input
-
-type="checkbox"
-
-name="poor_reviews"
-
-value="1"
-
-class="w-5 h-5"
-
-
-{{ $seller->poor_reviews ? 'checked' : '' }}
-
->
-
-
-Poor customer reviews (+2)
-
-
-</label>
-
-
-
-
-
-
-
-
-<label class="flex items-center gap-3">
-
-
-<input
-
-type="checkbox"
-
-name="incomplete_information"
-
-value="1"
-
-class="w-5 h-5"
-
-
-{{ $seller->incomplete_information ? 'checked' : '' }}
-
->
-
-
-Incomplete business information (+2)
-
-
-</label>
-
+@endforeach
 
 
 
@@ -546,14 +421,15 @@ Incomplete business information (+2)
 
 
 
-<!-- REASON -->
+<!-- OLD REASON -->
+
 
 <div class="mt-8 bg-yellow-50 rounded-3xl p-6">
 
 
 <h2 class="font-bold text-xl">
 
-📌 Current System Reason
+📌 Previous Decision Reason
 
 </h2>
 
@@ -561,10 +437,11 @@ Incomplete business information (+2)
 <p class="mt-3 text-gray-700">
 
 
-{{$seller->verification_reason ?? 'No verification completed yet.'}}
+{{$seller->verification_reason ?? 'No previous decision.'}}
 
 
 </p>
+
 
 
 </div>
@@ -585,10 +462,12 @@ class="mt-10 w-full py-4 rounded-2xl
 
 bg-gradient-to-r from-blue-600 to-purple-600
 
-text-white font-bold text-lg shadow-lg">
+text-white font-bold text-lg shadow-lg
+
+hover:scale-105 transition">
 
 
-Update Verification
+Save Verification Decision 🚀
 
 
 </button>
@@ -605,10 +484,13 @@ Update Verification
 
 
 
+
+
 </div>
 
 
 </div>
+
 
 
 @endsection

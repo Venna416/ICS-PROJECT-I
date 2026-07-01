@@ -2,25 +2,36 @@
 
 @section('content')
 
-<div class="min-h-screen bg-slate-100 p-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-blue-100 p-8">
+
 
 <div class="max-w-7xl mx-auto">
 
 
-<div class="bg-gradient-to-r from-orange-600 to-red-600 
-rounded-3xl shadow-xl p-10 text-white mb-10">
+
+{{-- HEADER --}}
+
+<div class="bg-gradient-to-r from-indigo-700 via-blue-700 to-slate-800
+
+rounded-3xl shadow-2xl p-10 text-white mb-10">
+
+
+<div class="flex justify-between items-center">
+
+
+<div>
 
 
 <h1 class="text-4xl font-bold">
 
-⚠️ Regulator Seller Concerns
+🛡️ Regulator Seller Concerns
 
 </h1>
 
 
-<p class="mt-3 text-orange-100">
+<p class="mt-3 text-indigo-100">
 
-Review regulator disagreements with seller verification decisions.
+Review regulator feedback and verify seller compliance decisions.
 
 </p>
 
@@ -29,17 +40,59 @@ Review regulator disagreements with seller verification decisions.
 
 
 
+<div class="text-6xl opacity-90">
+
+⚖️
+
+</div>
 
 
-<div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+</div>
+
+
+</div>
+
+
+
+
+
+
+@if(session('success'))
+
+<div class="mb-6 bg-emerald-100 border border-emerald-300
+
+text-emerald-700 rounded-2xl p-5 font-semibold shadow">
+
+
+✓ {{session('success')}}
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+
+
+{{-- TABLE CARD --}}
+
+
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
 
 
 <table class="w-full">
 
 
-<thead class="bg-gray-100">
+
+<thead class="bg-slate-900 text-white">
+
 
 <tr>
+
 
 <th class="p-5 text-left">
 Seller
@@ -47,23 +100,39 @@ Seller
 
 
 <th class="p-5 text-left">
-Regulator Reason
+Regulator
 </th>
 
 
-<th class="p-5">
-Status
+<th class="p-5 text-left">
+Concern
 </th>
 
 
-<th class="p-5">
+<th class="p-5 text-center">
+Decision
+</th>
+
+
+<th class="p-5 text-center">
+Review Status
+</th>
+
+
+<th class="p-5 text-center">
 Action
 </th>
 
 
 </tr>
 
+
 </thead>
+
+
+
+
+
 
 <tbody>
 
@@ -71,36 +140,119 @@ Action
 @forelse($concerns as $concern)
 
 
-<tr class="border-b hover:bg-gray-50">
 
-
-<td class="p-5 font-bold">
-
-{{ $concern->seller->brand_name ?? 'Unknown' }}
-
-</td>
+<tr class="border-b hover:bg-indigo-50 transition">
 
 
 
-<td class="p-5 text-gray-600">
-
-{{ $concern->reason }}
-
-</td>
 
 
-
+{{-- SELLER --}}
 
 
 <td class="p-5">
 
 
+<div>
+
+
+<p class="font-bold text-gray-800 text-lg">
+
+
+{{ $concern->seller->brand_name ?? 'Unknown Seller' }}
+
+
+</p>
+
+
+<p class="text-sm text-gray-500">
+
+
+{{ $concern->seller->user->name ?? '' }}
+
+
+</p>
+
+
+</div>
+
+
+</td>
+
+
+
+
+
+
+
+
+{{-- REGULATOR --}}
+
+
+<td class="p-5">
+
+
+<p class="font-semibold text-gray-800">
+
+
+{{ $concern->regulator->name ?? 'Unknown' }}
+
+
+</p>
+
+
+<span class="text-sm text-gray-500">
+
+Regulator
+
+</span>
+
+
+</td>
+
+
+
+
+
+
+
+
+{{-- CONCERN --}}
+
+
+<td class="p-5 text-gray-600 max-w-md">
+
+
+{{ $concern->reason }}
+
+
+</td>
+
+
+
+
+
+
+
+
+{{-- DECISION --}}
+
+
+<td class="p-5 text-center">
+
+
 @if($concern->is_fair)
 
 
-<span class="bg-green-100 text-green-700 px-4 py-2 rounded-xl">
+<span class="inline-flex items-center
+
+bg-green-100 text-green-700
+
+px-4 py-2 rounded-xl font-semibold">
+
 
 ✓ Fair Decision
+
 
 </span>
 
@@ -108,9 +260,63 @@ Action
 @else
 
 
-<span class="bg-red-100 text-red-700 px-4 py-2 rounded-xl">
+<span class="inline-flex items-center
+
+bg-red-100 text-red-700
+
+px-4 py-2 rounded-xl font-semibold">
+
 
 ✕ Not Fair
+
+
+</span>
+
+
+@endif
+
+
+</td>
+
+
+
+
+
+
+
+
+
+
+{{-- STATUS --}}
+
+
+<td class="p-5 text-center">
+
+
+@if($concern->reviewed)
+
+
+<span class="bg-emerald-100 text-emerald-700
+
+px-4 py-2 rounded-xl font-semibold">
+
+
+Reviewed ✓
+
+
+</span>
+
+
+@else
+
+
+<span class="bg-yellow-100 text-yellow-700
+
+px-4 py-2 rounded-xl font-semibold">
+
+
+Pending ⏳
+
 
 </span>
 
@@ -125,32 +331,42 @@ Action
 
 
 
-<td class="p-5">
-
-
-@if($concern->reviewed)
-
-
-<span class="bg-green-100 text-green-700 px-4 py-2 rounded-xl">
-
-Reviewed ✓
-
-</span>
 
 
 
-@else
+
+
+{{-- ACTION --}}
+
+
+<td class="p-5 text-center">
 
 
 <a href="{{route(
 
 'admin.editVerification',
 
-$concern->seller_id
+[
+
+$concern->seller_id,
+
+'from'=>'regulator'
+
+]
 
 )}}"
 
-class="bg-blue-600 text-white px-5 py-2 rounded-xl">
+
+
+class="inline-block
+
+bg-indigo-600 hover:bg-indigo-700
+
+text-white px-6 py-3
+
+rounded-xl font-semibold
+
+shadow-md transition">
 
 
 Review Decision
@@ -159,52 +375,76 @@ Review Decision
 </a>
 
 
-@endif
-
-
 
 </td>
 
 
+
+
+
+
 </tr>
+
+
 
 
 
 @empty
 
 
+
 <tr>
 
-<td colspan="4"
 
-class="p-10 text-center text-gray-500">
+<td colspan="6"
+
+class="p-12 text-center text-gray-500">
+
+
+<div class="text-5xl mb-3">
+
+📭
+
+</div>
 
 
 No regulator concerns found.
 
 
+
 </td>
 
+
 </tr>
+
 
 
 @endforelse
 
 
 
+
+
 </tbody>
+
 
 
 </table>
 
 
-</div>
-
-
 
 </div>
 
+
+
+
+
+
 </div>
+
+
+</div>
+
 
 
 @endsection

@@ -4,7 +4,7 @@
 @section('content')
 
 
-<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 py-10 px-6">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 py-10 px-6">
 
 
 <div class="max-w-7xl mx-auto">
@@ -13,24 +13,21 @@
 
 
 
-
-
-<!-- WELCOME CARD -->
+<!-- WELCOME HEADER -->
 
 <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-700
 
 rounded-3xl shadow-2xl p-10 text-white mb-10">
 
 
-
-<div class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
 
 
 
 <div>
 
 
-<h1 class="text-4xl font-bold">
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
 
 🛒 Welcome, {{Auth::user()->name}}
 
@@ -38,15 +35,40 @@ rounded-3xl shadow-2xl p-10 text-white mb-10">
 
 
 
-<p class="mt-4 text-indigo-100 text-lg">
+<p class="mt-4 text-indigo-100 text-lg max-w-2xl">
 
-Your buyer dashboard helps you discover trusted sellers, share experiences,
-and keep the marketplace safe.
+Discover trusted sellers, share your experiences, 
+and help keep the marketplace safe for everyone.
 
 </p>
 
 
+
+<div class="mt-6 flex gap-4">
+
+
+<span class="bg-white/20 px-5 py-2 rounded-full backdrop-blur">
+
+🛡️ Safe Shopping
+
+</span>
+
+
+<span class="bg-white/20 px-5 py-2 rounded-full backdrop-blur">
+
+⭐ Trusted Reviews
+
+</span>
+
+
+
 </div>
+
+
+
+</div>
+
+
 
 
 
@@ -59,12 +81,17 @@ and keep the marketplace safe.
 <div class="relative">
 
 
-
 <button
 
 onclick="toggleNotifications()"
 
-class="bg-white/20 backdrop-blur p-4 rounded-full text-3xl hover:bg-white/30 transition">
+class="relative bg-white/20 backdrop-blur-md
+
+p-5 rounded-full text-4xl
+
+hover:bg-white/30
+
+transition duration-300 shadow-lg">
 
 
 🔔
@@ -82,7 +109,7 @@ bg-red-600 text-white
 
 text-xs font-bold
 
-w-6 h-6 rounded-full
+w-7 h-7 rounded-full
 
 flex items-center justify-center">
 
@@ -105,17 +132,23 @@ flex items-center justify-center">
 
 
 
+
+<!-- DROPDOWN -->
+
+
 <div id="notifications"
 
-class="hidden absolute right-0 mt-4
+class="hidden absolute right-0 mt-5
 
 w-96 bg-white rounded-3xl
 
-shadow-2xl p-5 text-gray-800 z-50">
+shadow-2xl border
+
+p-5 text-gray-800 z-50">
 
 
 
-<h2 class="font-bold text-xl mb-4">
+<h2 class="font-bold text-xl mb-5">
 
 🔔 Notifications
 
@@ -125,16 +158,26 @@ shadow-2xl p-5 text-gray-800 z-50">
 
 
 
+
+<div class="max-h-96 overflow-y-auto">
+
+
 @forelse(auth()->user()->unreadNotifications as $notification)
 
 
 
-<a href="{{route('notifications.read',$notification->id)}}"
+<a
 
-class="block bg-blue-50 rounded-xl p-4 mb-3">
+href="{{route('notifications.read',$notification->id)}}"
+
+class="block bg-blue-50
+
+rounded-2xl p-4 mb-3
+
+hover:bg-blue-100 transition">
 
 
-<h3 class="font-bold">
+<h3 class="font-bold text-indigo-700">
 
 {{$notification->data['title']}}
 
@@ -148,6 +191,15 @@ class="block bg-blue-50 rounded-xl p-4 mb-3">
 </p>
 
 
+
+<p class="text-xs text-gray-400 mt-2">
+
+{{$notification->created_at->diffForHumans()}}
+
+</p>
+
+
+
 </a>
 
 
@@ -155,31 +207,16 @@ class="block bg-blue-50 rounded-xl p-4 mb-3">
 @empty
 
 
-<p class="text-gray-500">
+<p class="text-gray-500 text-center py-5">
 
-No notifications
+No new notifications
 
 </p>
-
 
 
 @endforelse
 
 
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-</div>
-
-
 </div>
 
 
@@ -188,9 +225,95 @@ No notifications
 
 
 
+<form method="POST"
+
+action="{{route('notifications.read.all')}}">
 
 
-<!-- DASHBOARD OPTIONS -->
+@csrf
+
+
+
+<button
+
+
+class="mt-4 w-full
+
+bg-indigo-600
+
+text-white
+
+py-3
+
+rounded-xl
+
+font-semibold
+
+hover:bg-indigo-700
+
+transition">
+
+
+✓ Mark all as read
+
+
+</button>
+
+
+
+</form>
+
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- QUICK ACTIONS -->
+
+
+<div class="mb-8">
+
+
+<h2 class="text-3xl font-bold text-gray-800">
+
+Marketplace Actions
+
+</h2>
+
+
+<p class="text-gray-500 mt-2">
+
+Manage your shopping experience and help improve seller trust.
+
+</p>
+
+
+</div>
+
+
+
 
 
 
@@ -202,30 +325,41 @@ No notifications
 
 
 
-<!-- SEARCH -->
+<!-- SEARCH SELLERS -->
 
 
 <a href="{{route('buyer.search')}}"
 
-class="bg-white rounded-3xl shadow-xl p-8
 
-hover:-translate-y-2 hover:shadow-2xl
+class="group bg-white rounded-3xl shadow-xl p-8
 
-transition duration-300">
+hover:-translate-y-2
+
+hover:shadow-2xl
+
+transition">
 
 
+<div class="w-16 h-16 rounded-2xl
 
-<div class="text-5xl mb-5">
+bg-indigo-100
+
+flex items-center justify-center
+
+text-4xl mb-6">
+
 
 🔎
+
 
 </div>
 
 
 
+
 <h2 class="text-2xl font-bold text-gray-800">
 
-Search Sellers
+Find Sellers
 
 </h2>
 
@@ -233,18 +367,17 @@ Search Sellers
 
 <p class="text-gray-500 mt-3">
 
-Find verified sellers and check their trust information.
+Search verified sellers and view trust information.
 
 </p>
 
 
 
-<div class="mt-6 text-indigo-600 font-semibold">
+<div class="mt-6 text-indigo-600 font-bold group-hover:translate-x-2 transition">
 
 Explore sellers →
 
 </div>
-
 
 
 </a>
@@ -262,25 +395,36 @@ Explore sellers →
 
 <a href="{{route('buyer.reviews')}}"
 
-class="bg-white rounded-3xl shadow-xl p-8
 
-hover:-translate-y-2 hover:shadow-2xl
+class="group bg-white rounded-3xl shadow-xl p-8
 
-transition duration-300">
+hover:-translate-y-2
+
+hover:shadow-2xl
+
+transition">
 
 
+<div class="w-16 h-16 rounded-2xl
 
-<div class="text-5xl mb-5">
+bg-yellow-100
+
+flex items-center justify-center
+
+text-4xl mb-6">
+
 
 ⭐
+
 
 </div>
 
 
 
+
 <h2 class="text-2xl font-bold text-gray-800">
 
-Write Reviews
+Buyer Reviews
 
 </h2>
 
@@ -288,18 +432,17 @@ Write Reviews
 
 <p class="text-gray-500 mt-3">
 
-Share your buying experience and help others make safer choices.
+Share your experience and help other buyers.
 
 </p>
 
 
 
-<div class="mt-6 text-indigo-600 font-semibold">
+<div class="mt-6 text-indigo-600 font-bold group-hover:translate-x-2 transition">
 
-Submit review →
+Write review →
 
 </div>
-
 
 
 </a>
@@ -317,25 +460,36 @@ Submit review →
 
 <a href="{{route('buyer.reports')}}"
 
-class="bg-white rounded-3xl shadow-xl p-8
 
-hover:-translate-y-2 hover:shadow-2xl
+class="group bg-white rounded-3xl shadow-xl p-8
 
-transition duration-300">
+hover:-translate-y-2
+
+hover:shadow-2xl
+
+transition">
 
 
+<div class="w-16 h-16 rounded-2xl
 
-<div class="text-5xl mb-5">
+bg-red-100
+
+flex items-center justify-center
+
+text-4xl mb-6">
+
 
 🚨
+
 
 </div>
 
 
 
+
 <h2 class="text-2xl font-bold text-gray-800">
 
-Fraud Reports
+Report Fraud
 
 </h2>
 
@@ -349,12 +503,11 @@ Report suspicious sellers and protect the marketplace.
 
 
 
-<div class="mt-6 text-indigo-600 font-semibold">
+<div class="mt-6 text-red-600 font-bold group-hover:translate-x-2 transition">
 
-Report issue →
+Submit report →
 
 </div>
-
 
 
 </a>
@@ -373,28 +526,49 @@ Report issue →
 
 
 
-<!-- INFO SECTION -->
 
 
-<div class="mt-10 bg-white rounded-3xl shadow-lg p-8">
+
+<!-- SAFETY CARD -->
+
+
+<div class="mt-10 bg-white rounded-3xl shadow-xl p-8 border">
+
+
+<div class="flex items-center gap-4">
+
+
+<div class="text-5xl">
+
+🛡️
+
+</div>
+
+
+
+<div>
 
 
 <h2 class="text-2xl font-bold text-gray-800">
 
-🛡️ Marketplace Safety
+Marketplace Safety
 
 </h2>
 
 
+<p class="text-gray-600 mt-2">
 
-<p class="text-gray-600 mt-3">
-
-Always verify sellers, review experiences honestly,
-and report suspicious activity to help keep everyone safe.
+Always verify sellers, leave honest reviews, 
+and report suspicious activity to keep buyers protected.
 
 </p>
 
 
+</div>
+
+
+</div>
+
 
 </div>
 
@@ -403,9 +577,13 @@ and report suspicious activity to help keep everyone safe.
 
 
 
-</div>
 
 </div>
+
+
+</div>
+
+
 
 
 

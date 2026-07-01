@@ -5,207 +5,656 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SellerProfile;
 use App\Models\SellerDocument;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AdminActivityNotification;
+
+
 
 class SellerProfileController extends Controller
 {
+
+
     public function create()
     {
         return view('seller.profile.create');
     }
 
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE PROFILE
+    |--------------------------------------------------------------------------
+    */
+
+
     public function store(Request $request)
     {
+
+
         $request->validate([
-            'profile_photo' => 'nullable|image|max:2048',
 
-            'id_front' => 'nullable|image|max:2048',
 
-            'id_back' => 'nullable|image|max:2048',
+            'profile_photo'=>'nullable|image|max:2048',
 
-            'documents.*' => 'nullable|file|max:5000',
+            'id_front'=>'nullable|image|max:2048',
 
-            'brand_name' => 'nullable|string|max:255',
+            'id_back'=>'nullable|image|max:2048',
 
-            'category' => 'nullable|string|max:255',
+            'documents.*'=>'nullable|file|max:5000',
 
-            'location' => 'nullable|string|max:255',
 
-            'phone' => 'nullable|string|max:20',
+            'brand_name'=>'nullable|string',
 
-            'social_platform' => 'nullable|string|max:255',
+            'category'=>'nullable|string',
 
-            'shop_link' => 'nullable|url',
+            'location'=>'nullable|string',
 
-            'description' => 'nullable|string',
+            'phone'=>'nullable|string',
+
+            'social_platform'=>'nullable|string',
+
+            'shop_link'=>'nullable|url',
+
+            'description'=>'nullable|string',
+
+
         ]);
 
-        // CREATE SELLER PROFILE
+
+
+
+
 
         $profile = SellerProfile::create([
-            'user_id' => Auth::id(),
 
-            'brand_name' => $request->brand_name,
 
-            'business_category' => $request->category,
+            'user_id'=>Auth::id(),
 
-            'location' => $request->location,
 
-            'phone_number' => $request->phone,
+            'brand_name'=>$request->brand_name,
 
-            'social_platform' => $request->social_platform,
 
-            'shop_link' => $request->shop_link,
+            'business_category'=>$request->category,
 
-            'description' => $request->description,
 
-            'profile_photo' => $request->file('profile_photo') ? $request->file('profile_photo')->store('profiles', 'public') : null,
+            'location'=>$request->location,
 
-            'id_front' => $request->file('id_front') ? $request->file('id_front')->store('ids', 'public') : null,
 
-            'id_back' => $request->file('id_back') ? $request->file('id_back')->store('ids', 'public') : null,
+            'phone_number'=>$request->phone,
 
-            'verification_status' => 'pending',
 
-            'verified' => false,
+            'social_platform'=>$request->social_platform,
 
-            'risk_score' => null,
 
-            'trust_score' => null,
+            'shop_link'=>$request->shop_link,
+
+
+            'description'=>$request->description,
+
+
+
+
+            'profile_photo'=>
+
+            $request->hasFile('profile_photo')
+
+            ?
+
+            $request->file('profile_photo')
+            ->store('profiles','public')
+
+            :
+
+            null,
+
+
+
+
+
+
+            'id_front'=>
+
+            $request->hasFile('id_front')
+
+            ?
+
+            $request->file('id_front')
+            ->store('ids','public')
+
+            :
+
+            null,
+
+
+
+
+
+
+            'id_back'=>
+
+            $request->hasFile('id_back')
+
+            ?
+
+            $request->file('id_back')
+            ->store('ids','public')
+
+            :
+
+            null,
+
+
+
+
+
+            'verification_status'=>'pending',
+
+
+            'verified'=>false,
+
+
+            'risk_score'=>0,
+
+
+            'trust_score'=>0,
+
+
+
         ]);
 
-        // SAVE EXTRA DOCUMENTS
 
-        if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE EXTRA DOCUMENTS
+        |--------------------------------------------------------------------------
+        */
+
+
+        if($request->hasFile('documents'))
+
+        {
+
+
+            foreach($request->file('documents') as $file)
+
+            {
+
+
                 SellerDocument::create([
-                    'seller_profile_id' => $profile->id,
 
-                    'document_type' => 'extra_evidence',
 
-                    'file_path' => $file->store('seller_documents', 'public'),
+                    'seller_profile_id'=>$profile->id,
+
+
+                    'document_type'=>'extra_evidence',
+
+
+                    'file_path'=>
+
+                    $file->store(
+                        'seller_documents',
+                        'public'
+                    )
+
+
                 ]);
+
+
             }
+
+
         }
 
-        return redirect()
-            ->route('seller.profile.show', $profile->id)
 
-            ->with('success', 'Profile submitted for verification. Awaiting admin review.');
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFY ADMINS
+        |--------------------------------------------------------------------------
+        */
+
+
+        $admins = User::where('role','admin')->get();
+
+
+
+        foreach($admins as $admin)
+
+        {
+
+
+            $admin->notify(
+
+                new AdminActivityNotification(
+
+                    "⏳ New Seller Verification Pending",
+
+                    "Seller {$profile->brand_name} submitted a profile and is waiting for verification."
+
+                )
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+
+
+        return redirect()
+
+        ->route(
+            'seller.profile.show',
+            $profile->id
+        )
+
+        ->with(
+            'success',
+            'Profile created successfully'
+        );
+
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
+
 
     public function show($id)
     {
-        $profile = SellerProfile::with('documents')->findOrFail($id);
 
-        return view('seller.profile.show', compact('profile'));
+
+        $profile = SellerProfile::with('documents')
+
+        ->findOrFail($id);
+
+
+
+        return view(
+
+            'seller.profile.show',
+
+            compact('profile')
+
+        );
+
+
     }
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT PAGE
+    |--------------------------------------------------------------------------
+    */
+
 
     public function edit($id)
     {
+
+
         $profile = SellerProfile::findOrFail($id);
 
-        return view('seller.profile.edit', compact('profile'));
+
+
+        return view(
+
+            'seller.profile.edit',
+
+            compact('profile')
+
+        );
+
+
     }
 
-    public function update(Request $request, $id)
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE PROFILE
+    |--------------------------------------------------------------------------
+    */
+
+
+    public function update(Request $request,$id)
+
     {
+
+
         $profile = SellerProfile::findOrFail($id);
 
+
+
+
+
         $request->validate([
-            'brand_name' => 'nullable|string|max:255',
 
-            'business_category' => 'nullable|string|max:255',
 
-            'location' => 'nullable|string|max:255',
 
-            'phone_number' => 'nullable|string|max:20',
+            'brand_name'=>'nullable|string',
 
-            'social_platform' => 'nullable|string|max:255',
 
-            'shop_link' => 'nullable|url',
+            'business_category'=>'nullable|string',
 
-            'description' => 'nullable|string',
 
-            'profile_photo' => 'nullable|image|max:2048',
+            'category'=>'nullable|string',
 
-            'id_front' => 'nullable|image|max:2048',
 
-            'id_back' => 'nullable|image|max:2048',
+            'location'=>'nullable|string',
 
-            'documents.*' => 'nullable|file|max:5000',
+
+            'phone_number'=>'nullable|string',
+
+
+            'phone'=>'nullable|string',
+
+
+            'social_platform'=>'nullable|string',
+
+
+            'shop_link'=>'nullable|url',
+
+
+            'description'=>'nullable|string',
+
+
+
+            'profile_photo'=>'nullable|image|max:2048',
+
+
+            'id_front'=>'nullable|image|max:2048',
+
+
+            'id_back'=>'nullable|image|max:2048',
+
+
+
         ]);
 
-        // UPDATE TEXT DETAILS
+
+
+
+
+
+
+
 
         $profile->brand_name = $request->brand_name;
 
-        $profile->business_category = $request->business_category;
 
-        $profile->location = $request->location;
 
-        $profile->phone_number = $request->phone_number;
 
-        $profile->social_platform = $request->social_platform;
 
-        $profile->shop_link = $request->shop_link;
+        $profile->business_category =
 
-        $profile->description = $request->description;
+        $request->business_category
 
-        // UPDATE IMAGES
+        ??
 
-        if ($request->hasFile('profile_photo')) {
-            $profile->profile_photo = $request->file('profile_photo')->store('profiles', 'public');
+        $request->category;
+
+
+
+
+
+
+
+        $profile->location =
+
+        $request->location;
+
+
+
+
+
+
+
+        $profile->phone_number =
+
+        $request->phone_number
+
+        ??
+
+        $request->phone;
+
+
+
+
+
+
+
+        $profile->social_platform =
+
+        $request->social_platform;
+
+
+
+
+
+
+
+        $profile->shop_link =
+
+        $request->shop_link;
+
+
+
+
+
+
+
+        $profile->description =
+
+        $request->description;
+
+
+
+
+
+
+
+
+
+
+
+
+        if($request->hasFile('profile_photo'))
+
+        {
+
+
+            $profile->profile_photo =
+
+            $request->file('profile_photo')
+
+            ->store(
+                'profiles',
+                'public'
+            );
+
+
         }
 
-        if ($request->hasFile('id_front')) {
-            $profile->id_front = $request->file('id_front')->store('ids', 'public');
+
+
+
+
+
+
+
+
+        if($request->hasFile('id_front'))
+
+        {
+
+
+            $profile->id_front =
+
+            $request->file('id_front')
+
+            ->store(
+                'ids',
+                'public'
+            );
+
+
         }
 
-        if ($request->hasFile('id_back')) {
-            $profile->id_back = $request->file('id_back')->store('ids', 'public');
+
+
+
+
+
+
+
+
+        if($request->hasFile('id_back'))
+
+        {
+
+
+            $profile->id_back =
+
+            $request->file('id_back')
+
+            ->store(
+                'ids',
+                'public'
+            );
+
+
         }
+
+
+
+
+
+
+
 
         $profile->save();
 
-        // ADD NEW EVIDENCE DOCUMENTS
 
-        if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
+
+
+
+
+
+
+
+        if($request->hasFile('documents'))
+
+        {
+
+
+            foreach($request->file('documents') as $file)
+
+            {
+
+
                 SellerDocument::create([
-                    'seller_profile_id' => $profile->id,
 
-                    'document_type' => 'extra_evidence',
 
-                    'file_path' => $file->store('seller_documents', 'public'),
+                    'seller_profile_id'=>$profile->id,
+
+
+                    'document_type'=>'extra_evidence',
+
+
+                    'file_path'=>
+
+                    $file->store(
+                        'seller_documents',
+                        'public'
+                    )
+
+
                 ]);
+
+
             }
+
+
         }
+
+
+
+
+
+
+
 
         return redirect()
-            ->route('seller.profile.show', $profile->id)
 
-            ->with('success', 'Profile updated successfully!');
+        ->route(
+            'seller.profile.show',
+            $profile->id
+        )
+
+        ->with(
+
+            'success',
+
+            'Profile updated successfully'
+
+        );
+
+
     }
 
-    public function index(Request $request)
-    {
-        $search = $request->input('query');
 
-        $sellerQuery = SellerProfile::query();
 
-        if (!empty($search)) {
-            $sellerQuery->where(function ($builder) use ($search) {
-                $builder->where('brand_name', 'like', "%{$search}%")
-                    ->orWhere('business_category', 'like', "%{$search}%")
-                    ->orWhere('location', 'like', "%{$search}%");
-            });
-        }
-
-        $sellers = $sellerQuery
-            ->where('verified', true)
-            ->get();
-
-        return view('seller.profile.search', compact('sellers', 'search'));
-    }
 }

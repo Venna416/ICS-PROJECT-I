@@ -5,7 +5,7 @@
 
 
 <div class="min-h-screen 
-bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 
+bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 
 p-8">
 
 
@@ -15,31 +15,70 @@ p-8">
 
 
 
+
 <!-- HEADER -->
 
-<div class="bg-gradient-to-r from-blue-700 via-purple-700 to-indigo-700
 
-rounded-3xl shadow-xl p-10 text-white mb-8">
+<div class="bg-gradient-to-r 
+from-blue-700 
+via-indigo-700 
+to-purple-700
+
+rounded-3xl 
+shadow-2xl 
+p-10 
+text-white 
+mb-10">
 
 
-<div class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+
+
 
 
 
 <div>
 
-<h1 class="text-4xl font-bold">
 
-🏪 Seller Dashboard
+<h1 class="text-4xl md:text-5xl font-extrabold">
+
+🏪 {{ $sellerProfile->brand_name ?? 'Seller Dashboard' }}
 
 </h1>
 
 
-<p class="mt-3 text-blue-100">
 
-Manage your verification, reputation and business activity.
+<p class="mt-4 text-blue-100 text-lg">
+
+Manage your verification status, business reputation,
+customer feedback and marketplace activity.
 
 </p>
+
+
+
+
+<div class="flex gap-4 mt-6">
+
+
+<span class="bg-white/20 px-5 py-2 rounded-full backdrop-blur">
+
+🛡️ Verification
+
+</span>
+
+
+
+<span class="bg-white/20 px-5 py-2 rounded-full backdrop-blur">
+
+⭐ Reputation
+
+</span>
+
+
+</div>
+
+
 
 
 </div>
@@ -50,32 +89,45 @@ Manage your verification, reputation and business activity.
 
 
 
+
+
 <!-- NOTIFICATION -->
 
+
 <div class="relative">
+
 
 
 <button
 
 onclick="toggleNotifications()"
 
-class="relative bg-white/20 backdrop-blur
+class="relative bg-white/20 backdrop-blur-md
 
-p-4 rounded-full
+p-5 rounded-full
 
-text-3xl
+text-4xl
 
-hover:bg-white/30">
+hover:bg-white/30
+
+transition
+
+shadow-lg">
+
 
 
 🔔
 
 
 
+
+
 @if(auth()->user()->unreadNotifications->count() > 0)
 
 
-<span class="absolute -top-2 -right-2
+<span
+
+class="absolute -top-2 -right-2
 
 bg-red-600
 
@@ -85,7 +137,7 @@ font-bold
 
 text-xs
 
-w-6 h-6
+w-7 h-7
 
 rounded-full
 
@@ -101,7 +153,12 @@ flex items-center justify-center">
 @endif
 
 
+
+
+
 </button>
+
+
 
 
 
@@ -111,7 +168,8 @@ flex items-center justify-center">
 
 <div id="notificationBox"
 
-class="hidden absolute right-0 mt-4
+
+class="hidden absolute right-0 mt-5
 
 w-96
 
@@ -121,6 +179,8 @@ rounded-3xl
 
 shadow-2xl
 
+border
+
 p-5
 
 text-gray-800
@@ -129,7 +189,9 @@ z-50">
 
 
 
-<h2 class="font-bold text-xl mb-4">
+
+
+<h2 class="font-bold text-xl mb-5">
 
 🔔 Notifications
 
@@ -139,10 +201,17 @@ z-50">
 
 
 
+
+<div class="max-h-96 overflow-y-auto">
+
+
+
 @forelse(auth()->user()->unreadNotifications as $notification)
 
 
+
 <a href="{{route('notifications.read',$notification->id)}}"
+
 
 class="block bg-blue-50
 
@@ -152,20 +221,30 @@ p-4
 
 mb-3
 
-hover:bg-blue-100">
+hover:bg-blue-100
+
+transition">
 
 
 
-<h3 class="font-bold">
+<h3 class="font-bold text-indigo-700">
 
 {{$notification->data['title']}}
 
 </h3>
 
 
+
 <p class="text-sm text-gray-600 mt-2">
 
 {{$notification->data['message']}}
+
+</p>
+
+
+<p class="text-xs text-gray-400 mt-2">
+
+{{$notification->created_at->diffForHumans()}}
 
 </p>
 
@@ -178,7 +257,8 @@ hover:bg-blue-100">
 @empty
 
 
-<p class="text-gray-500">
+
+<p class="text-gray-500 text-center py-5">
 
 No new notifications
 
@@ -196,14 +276,70 @@ No new notifications
 
 
 
+
+
+
+<form method="POST"
+
+action="{{route('notifications.read.all')}}">
+
+
+@csrf
+
+
+
+<button
+
+class="mt-4 w-full
+
+bg-indigo-600
+
+text-white
+
+py-3
+
+rounded-xl
+
+font-semibold
+
+hover:bg-indigo-700
+
+transition">
+
+
+✓ Mark all as read
+
+
+</button>
+
+
+
+</form>
+
+
+
+
+
+
+
 </div>
 
 
 
+
+</div>
+
+
+
+
+
 </div>
 
 
 </div>
+
+
+
 
 
 
@@ -216,7 +352,9 @@ No new notifications
 <!-- SCORE CARDS -->
 
 
-<div class="grid md:grid-cols-3 gap-6 mb-8">
+<div class="grid md:grid-cols-3 gap-8 mb-10">
+
+
 
 
 
@@ -224,10 +362,11 @@ No new notifications
 
 <!-- STATUS -->
 
-<div class="bg-white rounded-3xl shadow-lg p-7">
+
+<div class="bg-white rounded-3xl shadow-xl p-8 border">
 
 
-<p class="text-gray-500">
+<p class="text-gray-500 font-semibold">
 
 Verification Status
 
@@ -238,7 +377,7 @@ Verification Status
 @if($sellerProfile->verification_status == 'verified')
 
 
-<h2 class="text-3xl font-bold text-green-600 mt-4">
+<h2 class="text-3xl font-bold text-green-600 mt-5">
 
 ✓ Verified
 
@@ -249,7 +388,7 @@ Verification Status
 @elseif($sellerProfile->verification_status == 'rejected')
 
 
-<h2 class="text-3xl font-bold text-red-600 mt-4">
+<h2 class="text-3xl font-bold text-red-600 mt-5">
 
 ✕ Rejected
 
@@ -260,7 +399,7 @@ Verification Status
 @else
 
 
-<h2 class="text-3xl font-bold text-yellow-600 mt-4">
+<h2 class="text-3xl font-bold text-yellow-600 mt-5">
 
 ⏳ Pending
 
@@ -269,6 +408,7 @@ Verification Status
 
 
 @endif
+
 
 
 </div>
@@ -283,17 +423,19 @@ Verification Status
 
 <!-- TRUST -->
 
-<div class="bg-white rounded-3xl shadow-lg p-7">
+
+<div class="bg-white rounded-3xl shadow-xl p-8 border">
 
 
-<p class="text-gray-500">
+<p class="text-gray-500 font-semibold">
 
 ⭐ Trust Score
 
 </p>
 
 
-<h2 class="text-5xl font-bold text-purple-600 mt-4">
+
+<h2 class="text-5xl font-bold text-purple-600 mt-5">
 
 {{$trustScore ?? 0}}%
 
@@ -301,47 +443,24 @@ Verification Status
 
 
 
-@if(($trustScore ?? 0) >= 70)
+
+@if(($trustScore ?? 0)>=70)
 
 
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-green-100
-
-text-green-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-green-100 text-green-700 font-bold">
 
 High Trust
-
 
 </span>
 
 
 
-@elseif(($trustScore ?? 0) >=40)
+@elseif(($trustScore ?? 0)>=40)
 
 
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-yellow-100
-
-text-yellow-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-yellow-100 text-yellow-700 font-bold">
 
 Medium Trust
-
 
 </span>
 
@@ -350,27 +469,16 @@ Medium Trust
 @else
 
 
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-red-100
-
-text-red-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-red-100 text-red-700 font-bold">
 
 Low Trust
-
 
 </span>
 
 
 
 @endif
+
 
 
 </div>
@@ -385,93 +493,55 @@ Low Trust
 
 <!-- RISK -->
 
-<div class="bg-white rounded-3xl shadow-lg p-7">
+
+<div class="bg-white rounded-3xl shadow-xl p-8 border">
 
 
-<p class="text-gray-500">
+<p class="text-gray-500 font-semibold">
 
 ⚠ Risk Score
 
 </p>
 
 
-<h2 class="text-5xl font-bold text-red-600 mt-4">
 
+<h2 class="text-5xl font-bold text-red-600 mt-5">
 
 {{$riskScore ?? 0}}/10
-
 
 </h2>
 
 
 
 
+@if(($riskScore ?? 0)<=3)
 
-@if(($riskScore ?? 0) <= 3)
 
-
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-green-100
-
-text-green-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-green-100 text-green-700 font-bold">
 
 🟢 Low Risk
 
-
 </span>
 
 
 
-@elseif(($riskScore ?? 0) <=6)
+@elseif(($riskScore ?? 0)<=6)
 
 
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-yellow-100
-
-text-yellow-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-yellow-100 text-yellow-700 font-bold">
 
 🟡 Medium Risk
 
-
 </span>
-
 
 
 
 @else
 
 
-<span class="inline-block mt-3
-
-px-4 py-2
-
-rounded-full
-
-bg-red-100
-
-text-red-700
-
-font-bold">
-
+<span class="inline-block mt-4 px-5 py-2 rounded-full bg-red-100 text-red-700 font-bold">
 
 🔴 High Risk
-
 
 </span>
 
@@ -482,8 +552,6 @@ font-bold">
 
 
 </div>
-
-
 
 
 
@@ -502,10 +570,10 @@ font-bold">
 <!-- FEEDBACK -->
 
 
-<div class="bg-white rounded-3xl shadow-lg p-8 mb-8">
+<div class="bg-white rounded-3xl shadow-xl p-8 mb-10">
 
 
-<h2 class="text-2xl font-bold mb-5">
+<h2 class="text-2xl font-bold">
 
 📌 Verification Feedback
 
@@ -513,15 +581,13 @@ font-bold">
 
 
 
-<div class="bg-purple-50 rounded-2xl p-6">
+<div class="mt-5 bg-indigo-50 rounded-2xl p-6">
 
 
 <p class="text-gray-700">
 
 
-{{$sellerProfile->verification_reason 
-?? 
-'Waiting for admin verification.'}}
+{{$sellerProfile->verification_reason ?? 'Waiting for admin verification.'}}
 
 
 </p>
@@ -543,15 +609,14 @@ font-bold">
 <!-- ACTIVITY -->
 
 
-<div class="grid md:grid-cols-2 gap-8 mb-8">
-
-
+<div class="grid md:grid-cols-2 gap-8 mb-10">
 
 
 
 <a href="{{route('seller.reviews')}}"
 
-class="bg-white rounded-3xl shadow-lg p-8 hover:shadow-2xl">
+
+class="bg-white rounded-3xl shadow-xl p-8 hover:-translate-y-2 transition">
 
 
 <h2 class="text-2xl font-bold">
@@ -561,7 +626,8 @@ class="bg-white rounded-3xl shadow-lg p-8 hover:shadow-2xl">
 </h2>
 
 
-<p class="text-6xl font-bold text-purple-600 mt-5">
+
+<p class="text-6xl font-bold text-purple-600 mt-6">
 
 {{$reviewCount}}
 
@@ -575,6 +641,7 @@ Customer feedback received.
 </p>
 
 
+
 </a>
 
 
@@ -583,7 +650,9 @@ Customer feedback received.
 
 
 
-<div class="bg-white rounded-3xl shadow-lg p-8">
+
+
+<div class="bg-white rounded-3xl shadow-xl p-8">
 
 
 <h2 class="text-2xl font-bold">
@@ -593,16 +662,18 @@ Customer feedback received.
 </h2>
 
 
-<p class="text-6xl font-bold text-red-600 mt-5">
+
+<p class="text-6xl font-bold text-red-600 mt-6">
 
 {{$fraudCount}}
 
 </p>
 
 
+
 <p class="text-gray-500 mt-3">
 
-Reports associated with your business.
+Reports connected to your business.
 
 </p>
 
@@ -626,7 +697,7 @@ Reports associated with your business.
 <!-- PROFILE -->
 
 
-<div class="bg-white rounded-3xl shadow-lg p-8">
+<div class="bg-white rounded-3xl shadow-xl p-8">
 
 
 <h2 class="text-2xl font-bold">
@@ -636,12 +707,12 @@ Reports associated with your business.
 </h2>
 
 
-<p class="text-gray-500 mt-2">
 
-Manage your business details and documents.
+<p class="text-gray-500 mt-3">
+
+Manage your business information and verification documents.
 
 </p>
-
 
 
 
@@ -662,27 +733,37 @@ px-8 py-3
 
 rounded-xl
 
-font-bold">
+font-bold
+
+hover:scale-105
+
+transition">
 
 
-View Profile
-
+View Profile →
 
 </a>
 
 
-</div>
-
-
-
-
-
 
 
 </div>
 
 
+
+
+
+
+
+
+
 </div>
+
+
+</div>
+
+
+
 
 
 
@@ -695,10 +776,13 @@ View Profile
 function toggleNotifications(){
 
 
-let box = document.getElementById('notificationBox');
+document
 
+.getElementById('notificationBox')
 
-box.classList.toggle('hidden');
+.classList
+
+.toggle('hidden');
 
 
 }

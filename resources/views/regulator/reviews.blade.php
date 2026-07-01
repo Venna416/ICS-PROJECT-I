@@ -1,29 +1,36 @@
 @extends('layouts.app')
 
-
 @section('content')
 
 
-<div class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 p-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-blue-100 p-8">
 
 
 <div class="max-w-7xl mx-auto">
 
 
 
-<div class="mb-10">
+{{-- HEADER --}}
+
+<div class="bg-white rounded-3xl shadow-xl p-8 mb-10 border">
 
 
-<h1 class="text-4xl font-bold text-gray-800">
+<div class="flex flex-col md:flex-row justify-between gap-5">
+
+
+<div>
+
+
+<h1 class="text-4xl font-extrabold text-gray-800">
 
 💬 Review Moderation Center
 
 </h1>
 
 
-<p class="text-gray-600 mt-3">
+<p class="text-gray-500 mt-3">
 
-Monitor buyer feedback, suspicious reviews and marketplace trust.
+Monitor buyer reviews, suspicious activity and marketplace trust.
 
 </p>
 
@@ -34,14 +41,82 @@ Monitor buyer feedback, suspicious reviews and marketplace trust.
 
 
 
+{{-- SEARCH --}}
+
+<form method="GET"
+
+action="{{route('regulator.reviews')}}">
+
+
+<div class="relative">
+
+
+<input
+
+type="text"
+
+name="search"
+
+value="{{request('search')}}"
+
+placeholder="🔎 Search reviews..."
+
+class="w-80 px-5 py-3 rounded-2xl border
+
+shadow-sm
+
+focus:ring-2 focus:ring-indigo-500"
+
+>
+
+
+
+@if(request('search'))
+
+<a href="{{route('regulator.reviews')}}"
+
+class="absolute right-4 top-3 text-gray-400">
+
+
+✕
+
+</a>
+
+@endif
+
+
+</div>
+
+
+</form>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
 
 @if(session('success'))
 
-<div class="bg-green-100 text-green-700 p-4 rounded-xl mb-6">
+<div class="bg-green-100 text-green-700
+
+p-4 rounded-2xl mb-6">
+
 
 {{session('success')}}
 
+
 </div>
+
 
 @endif
 
@@ -51,18 +126,23 @@ Monitor buyer feedback, suspicious reviews and marketplace trust.
 
 
 
+{{-- REVIEWS --}}
+
+
+
 @forelse($reviews as $review)
 
 
 
-<div class="bg-white rounded-3xl shadow-lg p-8 mb-6">
+<div class="bg-white rounded-3xl shadow-lg p-7 mb-6
+
+hover:shadow-xl transition">
 
 
 
 
 
-<div class="flex justify-between items-start">
-
+<div class="flex justify-between">
 
 
 <div>
@@ -70,22 +150,23 @@ Monitor buyer feedback, suspicious reviews and marketplace trust.
 
 <h2 class="text-xl font-bold text-indigo-700">
 
+
 🏪 {{$review->brand_name}}
+
 
 </h2>
 
 
 <p class="text-gray-500">
 
+
 Seller: {{$review->seller_name}}
+
 
 </p>
 
 
-
 </div>
-
-
 
 
 
@@ -123,11 +204,11 @@ Active
 </span>
 
 
+
 @endif
 
 
 
-
 </div>
 
 
@@ -137,32 +218,28 @@ Active
 
 
 
+<div class="mt-5 bg-slate-50 rounded-2xl p-5">
 
 
-<div class="mt-6 bg-gray-50 rounded-2xl p-5">
-
-
-
-<p class="text-yellow-500 text-xl">
+<div class="text-yellow-500 text-xl">
 
 
 {{str_repeat('⭐',$review->rating)}}
 
-</p>
-
-
-
-
-<p class="mt-3 text-gray-700 italic">
-
-"{{$review->review}}"
-
-</p>
-
-
 
 </div>
 
+
+<p class="mt-3 italic text-gray-700">
+
+
+"{{$review->review}}"
+
+
+</p>
+
+
+</div>
 
 
 
@@ -187,18 +264,24 @@ Active
 
 
 
+
+
 @if($review->status != 'hidden')
 
-<form action="{{route('regulator.review.hide',$review->id)}}"
 
-method="POST">
+<form method="POST"
+
+action="{{route('regulator.review.hide',$review->id)}}">
+
 
 @csrf
 
 @method('PUT')
 
 
-<button class="bg-yellow-500 text-white px-5 py-2 rounded-xl">
+<button
+
+class="bg-yellow-500 text-white px-5 py-2 rounded-xl">
 
 
 Hide
@@ -208,6 +291,7 @@ Hide
 
 
 </form>
+
 
 @endif
 
@@ -221,16 +305,19 @@ Hide
 @if($review->status == 'hidden')
 
 
-<form action="{{route('regulator.review.restore',$review->id)}}"
+<form method="POST"
 
-method="POST">
+action="{{route('regulator.review.restore',$review->id)}}">
+
 
 @csrf
 
 @method('PUT')
 
 
-<button class="bg-blue-600 text-white px-5 py-2 rounded-xl">
+<button
+
+class="bg-blue-600 text-white px-5 py-2 rounded-xl">
 
 
 Restore
@@ -250,11 +337,9 @@ Restore
 
 
 
+<form method="POST"
 
-
-<form action="{{route('regulator.review.delete',$review->id)}}"
-
-method="POST">
+action="{{route('regulator.review.delete',$review->id)}}">
 
 
 @csrf
@@ -262,13 +347,14 @@ method="POST">
 @method('DELETE')
 
 
+<button
 
-<button onclick="return confirm('Remove review permanently?')"
+onclick="return confirm('Delete review permanently?')"
 
 class="bg-red-600 text-white px-5 py-2 rounded-xl">
 
 
-Remove
+Delete
 
 
 </button>
@@ -281,17 +367,15 @@ Remove
 
 
 
+
+</div>
+
+
 </div>
 
 
 
 </div>
-
-
-
-
-</div>
-
 
 
 
@@ -299,16 +383,17 @@ Remove
 @empty
 
 
-<div class="bg-white rounded-3xl p-10 text-center text-gray-500">
+<div class="bg-white rounded-3xl p-10 text-center text-gray-400">
 
 
-📭 No buyer reviews found.
+📭 No reviews found
 
 
 </div>
 
 
 @endforelse
+
 
 
 

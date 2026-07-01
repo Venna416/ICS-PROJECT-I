@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Models\SellerProfile;
 use App\Models\User;
 use App\Models\BuyerProfile;
+use App\Models\Review;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SellerProfileController;
@@ -384,17 +385,16 @@ $seller = App\Models\SellerProfile::findOrFail($id);
 
 
 
-$reviews = App\Models\Review::where(
-
-'brand_name',
-
-$seller->brand_name
-
-)
-
-->latest()
-
-->get();
+$reviews = Review::where(
+        'brand_name',
+        $seller->brand_name
+    )
+    ->where(
+        'status',
+        'active'
+    )
+    ->latest()
+    ->get();
 
 
 
@@ -765,64 +765,68 @@ Route::put(
 
 });
 
-
-   /*
+/*
 |--------------------------------------------------------------------------
 | NOTIFICATIONS
 |--------------------------------------------------------------------------
 */
-    Route::get('/test-notification', function () {
-        $user = User::find(1, ['*']);
 
-        if(!$user) {
-            return "No user found.";
+Route::middleware('auth')->group(function () {
+
+
+    // Read one notification
+    Route::get('/notifications/read/{id}', function ($id) {
+
+
+        $user = Auth::user();
+
+
+        $notification = $user
+            ->notifications()
+            ->where('id', $id)
+            ->first();
+
+
+
+        if($notification){
+
+            $notification->markAsRead();
+
         }
 
-        $profile = SellerProfile::where('user_id', '=', $user->id, 'and')->first();
-        if(!$profile) {
-            return "Please create a seller profile for the user first.";
-        }
-
-        Notification::send($user, new SellerStatusUpdated($profile, 'approved'));
-        return "Notification stored and email sent to user: {$user->email} regarding profile: {$profile->brand_name} with status: approved.";
-    });
-
-    /*
-|--------------------------------------------------------------------------
-| NOTIFICATION READ
-|--------------------------------------------------------------------------
-*/
-Route::get('/notifications/read/{id}', function ($id) {
 
 
-    $user = Auth::user();
+        return back();
 
-    if (!$user) {
-        return redirect()->route('login');
-    }
 
-    $notification = $user
-        ->notifications()
-        ->where('id',$id)
-        ->first();
+    })->name('notifications.read');
 
 
 
-    if($notification){
-
-
-        $notification->markAsRead();
-
-
-    }
 
 
 
-    return redirect()->back();
+    // Read all notifications
+    Route::post('/notifications/read-all', function () {
 
 
-})->middleware('auth')->name('notifications.read');
+        $user = Auth::user();
 
+
+        $user
+            ->unreadNotifications
+            ->markAsRead();
+
+
+
+        return back();
+
+
+    })->name('notifications.read.all');
+
+
+
+});
     /*
 |--------------------------------------------------------------------------
 | PROFILE REDIRECT
